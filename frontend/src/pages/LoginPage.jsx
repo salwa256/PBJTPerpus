@@ -199,7 +199,7 @@ export default function LoginPage({ onLogin, showToast, setLoader }) {
               fontSize: 14,
             }}
           >
-            Sistem Perpustakaan Digital
+            Selamat Datang di Sistem Perpustakaan PBJT
           </p>
 
           {/* USERNAME */}

@@ -1,9 +1,9 @@
 import { useState } from "react";
+
 import {
   BrowserRouter,
   Routes,
   Route,
-  useNavigate
 } from "react-router-dom";
 
 // Hooks
@@ -25,36 +25,51 @@ import SearchBookPage from "./pages/SearchBookPage";
 import RekomendasiPage from "./pages/rekomendasi";
 import MembersPage from "./pages/MembersPage";
 import Carianggota from "./pages/Carianggota";
+import ChatBotPage from "./pages/ChatBotPage";
 
 export default function App() {
 
   // ───────── SESSION ─────────
+
   const [session, setSession] =
     useState(null);
 
   // ───────── SIDEBAR ─────────
-  const [sidebarOpen, setSidebarOpen] =
-    useState(true);
+
+  const [
+    sidebarOpen,
+    setSidebarOpen
+  ] = useState(true);
 
   // ───────── SELECTED MEMBER ─────────
+
   const [
     selectedMember,
     setSelectedMember
   ] = useState(null);
 
   // ───────── HOOKS ─────────
-  const { toast, showToast } =
-    useToast();
 
-  const { loader, setLoader } =
-    useLoader();
+  const {
+    toast,
+    showToast
+  } = useToast();
+
+  const {
+    loader,
+    setLoader
+  } = useLoader();
 
   // ───────── LOGIN ─────────
+
   function handleLogin(data) {
+
     setSession(data);
+
   }
 
   // ───────── LOGOUT ─────────
+
   function handleLogout() {
 
     setSession(null);
@@ -63,6 +78,7 @@ export default function App() {
       "Berhasil keluar",
       "info"
     );
+
   }
 
   return (
@@ -81,13 +97,17 @@ export default function App() {
         }
 
         body {
+
           font-family:
             'Plus Jakarta Sans',
             sans-serif;
 
           background: #f5f4f0;
+
           color: #1a1a1a;
+
           font-size: 14px;
+
         }
 
         a {
@@ -127,7 +147,7 @@ export default function App() {
 
         <BrowserRouter>
 
-          {/* SIDEBAR */}
+          {/* ───────── SIDEBAR ───────── */}
 
           <Navbar
             username={session.username}
@@ -139,7 +159,7 @@ export default function App() {
             role={session.role}
           />
 
-          {/* CONTENT */}
+          {/* ───────── CONTENT ───────── */}
 
           <div
             style={{
@@ -171,7 +191,8 @@ export default function App() {
               <Route
                 path="/"
                 element={
-                  session.role === "admin"
+                  session.role ===
+                  "admin"
                     ? (
                       <HomePage
                         showToast={
@@ -184,7 +205,9 @@ export default function App() {
                     )
                     : (
                       <BorrowPage
-                        session={session}
+                        session={
+                          session
+                        }
                         showToast={
                           showToast
                         }
@@ -234,11 +257,14 @@ export default function App() {
 
                       localStorage.setItem(
                         "selectedBook",
-                        JSON.stringify(book)
+                        JSON.stringify(
+                          book
+                        )
                       );
 
                       window.location.href =
                         "/borrow";
+
                     }}
                   />
                 }
@@ -265,7 +291,8 @@ export default function App() {
               <Route
                 path="/books"
                 element={
-                  session.role === "admin"
+                  session.role ===
+                  "admin"
                     ? (
                       <BooksPage
                         showToast={
@@ -333,19 +360,31 @@ export default function App() {
                 }
               />
 
+              {/* CARI ANGGOTA */}
+
               <Route
-  path="/carianggota"
-  element={
-    <Carianggota
-      showToast={
-        showToast
-      }
-      setLoader={
-        setLoader
-      }
-    />
-  }
-/>
+                path="/carianggota"
+                element={
+                  <Carianggota
+                    showToast={
+                      showToast
+                    }
+                    setLoader={
+                      setLoader
+                    }
+                  />
+                }
+              />
+
+              {/* CHATBOT */}
+
+              <Route
+                path="/chatbot"
+                element={
+                  <ChatBotPage />
+                }
+              />
+
             </Routes>
 
           </div>

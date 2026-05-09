@@ -4,7 +4,40 @@ from pydantic import BaseModel
 import mysql.connector
 from datetime import date, datetime
 import httpx
+from fastapi import Query, UploadFile, File, Form
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+import pandas as pd
+import shutil
+from pathlib import Path
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+from collections import Counter
+import uuid
 import os
+import pandas as pd
+import shutil
+
+from pathlib import Path
+
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+from sklearn.metrics.pairwise import cosine_similarity
+
+from collections import Counter
+
+import uuid
+
+from fastapi import (
+    UploadFile,
+    File,
+    Form,
+    Query
+)
+
+from fastapi.responses import HTMLResponse
+
+from fastapi.staticfiles import StaticFiles
 
 app = FastAPI(title="Sistem Perpustakaan API")
 
@@ -76,6 +109,79 @@ class MemberModel(BaseModel):
     major:str
     phone:str
     address:str
+
+BASE_DIR = Path(__file__).resolve().parent
+DATASET_PATH = BASE_DIR / "dataset_buku.csv"
+IMAGES_DIR = BASE_DIR / "static/images"
+
+IMAGES_DIR.mkdir(parents=True, exist_ok=True)
+
+# =====================
+# INIT APP
+# =====================
+app = FastAPI(title="Sistem Rekomendasi Buku")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+app.mount("/images", StaticFiles(directory=IMAGES_DIR), name="images")
+
+# =====================
+# LOAD DATASET
+# =====================
+if DATASET_PATH.exists():
+    df = pd.read_csv(DATASET_PATH)
+else:
+    df = pd.DataFrame(columns=[
+        "judul",
+        "pengarang",
+        "klasifikasi",
+        "status",
+        "genre_utama",
+        "subgenre",
+        "genre",
+        "content",
+        "image_url"
+    ])
+
+df = df.fillna("")
+def normalize_filename(text):
+    return text.lower().strip().replace(" ", "_")
+
+def find_existing_image(judul):
+    base_name = normalize_filename(judul)
+
+    for ext in ["jpg", "jpeg", "png", "webp"]:
+        file_path = IMAGES_DIR / f"{base_name}.{ext}"
+        if file_path.exists():
+            return f"/images/{base_name}.{ext}"
+
+    return "/images/no_cover.png"
+
+df["image_url"] = df["judul"].apply(find_existing_image)
+
+# =====================
+# TF-IDF SETUP
+# =====================
+vectorizer = TfidfVectorizer(stop_words=None)
+tfidf_matrix = None
+
+def update_tfidf():
+    global tfidf_matrix
+    if len(df) == 0:
+        tfidf_matrix = None
+        return
+    
+    tfidf_matrix = vectorizer.fit_transform(df["content"])
+
+update_tfidf()
+
+search_log = Counter()
 
 # ══════════════════════════════════════════════
 # AUTH
@@ -173,6 +279,43 @@ def search_books(q: str = ""):
     db.close()
 
     return books
+
+class RequestRekomendasi(BaseModel):
+    genre: str
+    subgenre: str
+
+@app.post("/recommend")
+def recommend(data: RequestRekomendasi):
+
+    if tfidf_matrix is None:
+        return {"recommendations": [], "popular": []}
+
+    query_text = f"{data.genre} {data.subgenre}".strip()
+    query_vec = vectorizer.transform([query_text])
+
+    similarity = cosine_similarity(query_vec, tfidf_matrix)[0]
+    top_idx = similarity.argsort()[-5:][::-1]
+
+    hasil = []
+
+    for i in top_idx:
+        row = df.iloc[i]
+
+        hasil.append({
+            "judul": row["judul"],
+            "pengarang": row["pengarang"],
+            "klasifikasi": row["klasifikasi"],
+            "image_url": row["image_url"],
+            "description": f"Buku karya {row['pengarang']}"
+        })
+
+        search_log[row["judul"]] += 1
+
+    return {
+        "recommendations": hasil,
+        "popular": [j for j, _ in search_log.most_common(5)]
+    }
+
 
 
 @app.post("/books")

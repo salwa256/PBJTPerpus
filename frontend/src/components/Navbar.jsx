@@ -13,6 +13,7 @@ import addbooks from "../assets/addbooks.png";
 import rekomen from "../assets/rekomen.png";
 import out from "../assets/keluar.png";
 import anggota from "../assets/anggota.png";
+import chatbot from "../assets/chatbot.png";
 
 const TABS = [
   {
@@ -77,6 +78,14 @@ const TABS = [
     icon: anggota,
     path: "/members",
     roles: ["admin"],
+  }, 
+
+  {
+    id: "chatbot",
+    label: "Chatbot",
+    icon: chatbot,
+    path: "/chatbot",
+    roles: ["admin", "petugas"],
   }
 ];
 

@@ -744,7 +744,7 @@ export default function ReturnPage({
                 style={{
                   width: "100%",
                   background:
-                    "linear-gradient(135deg,#16a34a,#15803d)",
+                    "#2f35d7",
                   color: "#fff",
                   border: "none",
                   borderRadius: 16,
