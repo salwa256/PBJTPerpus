@@ -16,6 +16,7 @@ import buku from "../assets/addbooks.png";
 import borrow from "../assets/borrow.png";
 import terlambat from "../assets/terlambat.png";
 import ada from "../assets/ada.png";
+import anggota from "../assets/anggota.png";
 
 export default function HomePage({
   showToast,
@@ -933,6 +934,15 @@ function StatCards({
       bg: "#fee2e2",
       color: "#991b1b",
       icon: terlambat,
+    },
+
+    {
+      label: "Anggota",
+      value: stats.members,
+      badge: "Terdaftar",
+      bg: "#dcfce7",
+      color: "#166534",
+      icon: anggota,
     },
   ];
 

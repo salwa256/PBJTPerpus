@@ -639,16 +639,13 @@ def return_book(data: ReturnModel):
     }
 
 
-# ══════════════════════════════════════════════
-# STATS
-# ══════════════════════════════════════════════
-
 @app.get("/stats")
 def get_stats():
 
     db = get_db()
     cur = db.cursor(dictionary=True)
 
+    # total buku
     cur.execute("""
         SELECT COUNT(*) as total
         FROM books
@@ -656,6 +653,7 @@ def get_stats():
 
     total = cur.fetchone()["total"]
 
+    # dipinjam
     cur.execute("""
         SELECT COUNT(*) as c
         FROM books
@@ -664,6 +662,7 @@ def get_stats():
 
     borrowed = cur.fetchone()["c"]
 
+    # tersedia
     cur.execute("""
         SELECT COUNT(*) as c
         FROM books
@@ -672,7 +671,7 @@ def get_stats():
 
     available = cur.fetchone()["c"]
 
-    # update status terlambat
+    # update terlambat
     cur.execute("""
         UPDATE loans
         SET status='terlambat'
@@ -682,6 +681,7 @@ def get_stats():
 
     db.commit()
 
+    # total terlambat
     cur.execute("""
         SELECT COUNT(*) as c
         FROM loans
@@ -690,15 +690,23 @@ def get_stats():
 
     overdue = cur.fetchone()["c"]
 
+    # total anggota
+    cur.execute("""
+        SELECT COUNT(*) as c
+        FROM members
+    """)
+
+    members = cur.fetchone()["c"]
+
     db.close()
 
     return {
         "total": total,
         "borrowed": borrowed,
         "available": available,
-        "overdue": overdue
+        "overdue": overdue,
+        "members": members
     }
-
 
 # ══════════════════════════════════════════════
 # USERS
