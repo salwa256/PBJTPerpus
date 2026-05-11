@@ -10,12 +10,15 @@ export default function FormField({ label, children }) {
       <label
         style={{
           display: "block",
-          fontSize: 11,
+          fontSize: 12,
           fontWeight: 600,
           textTransform: "uppercase",
           letterSpacing: ".05em",
           color: "#666",
           marginBottom: 6,
+          wordWrap: "break-word",
+          whiteSpace: "normal",
+          lineHeight: 1.4,
         }}
       >
         {label}

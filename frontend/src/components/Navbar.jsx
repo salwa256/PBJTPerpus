@@ -40,15 +40,7 @@ const TABS = [
     roles: ["admin", "petugas"],
   },
 
-  {
-    id: "search",
-    label: "Search",
-    icon: search,
-    path: "/search",
-    roles: ["admin", "petugas"],
-  },
-
-  {
+    {
     id: "return",
     label: "Pengembalian",
     icon: returnIcon,
@@ -57,36 +49,44 @@ const TABS = [
   },
 
   {
-    id: "books",
-    label: "Tambah",
-    icon: addbooks,
-    path: "/books",
-    roles: ["admin"],
+    id: "search",
+    label: "Cari Buku",
+    icon: search,
+    path: "/search",
+    roles: ["admin", "petugas"],
   },
 
   {
     id: "rekomendasi",
-    label: "Rekomendasi",
+    label: "Rekomendasi Buku",
     icon: rekomen,
     path: "/rekomendasi",
     roles: ["admin", "petugas"],
   },
 
+   {
+    id: "chatbot",
+    label: "Asisten Perpus",
+    icon: chatbot,
+    path: "/chatbot",
+    roles: ["admin", "petugas"],
+  },
+
   {
     id: "members",
-    label: "Anggota",
+    label: "Tambah Anggota",
     icon: anggota,
     path: "/members",
     roles: ["admin"],
   }, 
 
-  {
-    id: "chatbot",
-    label: "Chatbot",
-    icon: chatbot,
-    path: "/chatbot",
-    roles: ["admin", "petugas"],
-  }
+    {
+    id: "books",
+    label: "Tambah Buku",
+    icon: addbooks,
+    path: "/books",
+    roles: ["admin"],
+  },
 ];
 
 export default function Navbar({
@@ -135,7 +135,7 @@ export default function Navbar({
           padding: 16,
           transition: "all 0.3s ease",
           zIndex: 200,
-          overflow: "hidden",
+          overflow: "auto",
           boxShadow: "0 0 30px rgba(0,0,0,0.03)",
         }}
       >
@@ -158,7 +158,7 @@ export default function Navbar({
               <div
                 style={{
                   fontWeight: 700,
-                  fontSize: 16,
+                  fontSize: 18,
                 }}
               >
                 Perpustakaan PBJT
@@ -205,15 +205,19 @@ export default function Navbar({
     ? "#4f46e5"
     : "#333",
   fontWeight: active ? 700 : 500,
-  whiteSpace: "nowrap",
+  whiteSpace: sidebarOpen ? "normal" : "nowrap",
+  wordWrap: "break-word",
+  overflow: "visible",
+  minHeight: 24,
 }}
                 >
                   {/* ICON */}
                   <span
                     style={{
-                      fontSize: 18,
+                      fontSize: 8,
                       minWidth: 24,
                       textAlign: "center",
+                      flexShrink: 0,
                     }}
                   >
                     <img
@@ -225,11 +229,13 @@ export default function Navbar({
 
                   {/* TEXT */}
                   {sidebarOpen && (
-                    <span>
-                      {tab.label.replace(
-                        /^[^\s]+\s/,
-                        ""
-                      )}
+                    <span
+                      style={{
+                        flex: 1,
+                        lineHeight: 1.3,
+                      }}
+                    >
+                      {tab.label}
                     </span>
                   )}
                 </Link>

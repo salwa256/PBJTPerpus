@@ -3,9 +3,14 @@
 // ═══════════════════════════════════════════════════════
 
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 
-import { apiFetch } from "../utils/api";
+import {
+  useNavigate
+} from "react-router-dom";
+
+import {
+  apiFetch
+} from "../utils/api";
 
 export default function Carianggota({
   showToast,
@@ -33,6 +38,21 @@ export default function Carianggota({
     setLoading
   ] = useState(false);
 
+  const [
+    editingMemberId,
+    setEditingMemberId
+  ] = useState(null);
+
+  const [form, setForm] =
+    useState({
+      member_code: "",
+      name: "",
+      nim: "",
+      major: "",
+      phone: "",
+      address: "",
+    });
+
   // ───────── SEARCH ─────────
 
   async function searchMembers(q) {
@@ -44,6 +64,7 @@ export default function Carianggota({
       setResults([]);
 
       return;
+
     }
 
     setLoading(true);
@@ -70,6 +91,117 @@ export default function Carianggota({
       setLoading(false);
 
     }
+
+  }
+
+  // ───────── UPDATE FORM ─────────
+
+  function update(field, value) {
+
+    setForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+
+  }
+
+  // ───────── START EDIT ─────────
+
+  function startEdit(member) {
+
+    setForm({
+      member_code:
+        member.member_code,
+
+      name:
+        member.name,
+
+      nim:
+        member.nim,
+
+      major:
+        member.major,
+
+      phone:
+        member.phone,
+
+      address:
+        member.address,
+    });
+
+    setEditingMemberId(
+      member.id
+    );
+
+  }
+
+  // ───────── SAVE EDIT ─────────
+
+  async function saveEdit() {
+
+    try {
+
+      await apiFetch(
+        `/members/${editingMemberId}`,
+        "PUT",
+        form
+      );
+
+      showToast(
+        "Data anggota berhasil diperbarui",
+        "ok"
+      );
+
+      setEditingMemberId(
+        null
+      );
+
+      searchMembers(query);
+
+    } catch (e) {
+
+      showToast(
+        e.message,
+        "err"
+      );
+
+    }
+
+  }
+
+  // ───────── DELETE ─────────
+
+  async function handleDelete(id) {
+
+    if (
+      !window.confirm(
+        "Hapus anggota ini?"
+      )
+    ) return;
+
+    try {
+
+      await apiFetch(
+        `/members/${id}`,
+        "DELETE"
+      );
+
+      showToast(
+        "Anggota berhasil dihapus",
+        "ok"
+      );
+
+      searchMembers(query);
+
+    } catch (e) {
+
+      showToast(
+        e.message,
+        "err"
+      );
+
+    }
+
   }
 
   return (
@@ -80,24 +212,36 @@ export default function Carianggota({
       <style>{`
 
         .search-page {
-          animation: fadePage .4s ease;
+
+          animation:
+            fadePage .4s ease;
+
         }
 
         @keyframes fadePage {
 
           from {
+
             opacity: 0;
-            transform: translateY(20px);
+
+            transform:
+              translateY(20px);
+
           }
 
           to {
+
             opacity: 1;
-            transform: translateY(0);
+
+            transform:
+              translateY(0);
+
           }
 
         }
 
         .glass-card {
+
           background:
             rgba(255,255,255,.92);
 
@@ -109,10 +253,13 @@ export default function Carianggota({
 
           box-shadow:
             0 10px 30px rgba(0,0,0,.05);
+
         }
 
         .modern-input {
+
           width: 100%;
+
           border:
             1px solid #e5e7eb;
 
@@ -127,6 +274,7 @@ export default function Carianggota({
           transition: .2s;
 
           box-sizing: border-box;
+
         }
 
         .modern-input:focus {
@@ -144,8 +292,6 @@ export default function Carianggota({
 
           transition: .25s ease;
 
-          cursor: pointer;
-
         }
 
         .member-card:hover {
@@ -156,9 +302,6 @@ export default function Carianggota({
           box-shadow:
             0 16px 30px
             rgba(0,0,0,.08);
-
-          border-color:
-            rgba(79,70,229,.3);
 
         }
 
@@ -176,13 +319,72 @@ export default function Carianggota({
 
         }
 
+        .edit-modal {
+
+          position: fixed;
+
+          inset: 0;
+
+          background:
+            rgba(0,0,0,.45);
+
+          display: flex;
+
+          align-items: center;
+
+          justify-content:
+            center;
+
+          z-index: 9999;
+
+          padding: 20px;
+
+        }
+
+        .edit-box {
+
+          width: 100%;
+
+          max-width: 520px;
+
+          background: white;
+
+          border-radius: 28px;
+
+          padding: 28px;
+
+          animation:
+            fadeScale .25s ease;
+
+        }
+
+        @keyframes fadeScale {
+
+          from {
+
+            opacity: 0;
+
+            transform:
+              scale(.95);
+
+          }
+
+          to {
+
+            opacity: 1;
+
+            transform:
+              scale(1);
+
+          }
+
+        }
+
       `}</style>
 
       {/* ───────── PAGE ───────── */}
 
-      <div
-        className="search-page"
-      >
+      <div className="search-page">
 
         {/* HEADER */}
 
@@ -192,9 +394,30 @@ export default function Carianggota({
           }}
         >
 
+          <div
+            style={{
+              fontSize: 30,
+              fontWeight: 800,
+              marginBottom: 8,
+            }}
+          >
+            Cari Anggota
+          </div>
+
+          <div
+            style={{
+              color: "#666",
+              fontSize: 14,
+            }}
+          >
+            Cari anggota perpustakaan
+            lalu klik untuk lanjut
+            ke peminjaman buku
+          </div>
+
         </div>
 
-        {/* SEARCH BOX */}
+        {/* SEARCH */}
 
         <div
           className="glass-card"
@@ -218,19 +441,8 @@ Cari nama / NIM / kode anggota...
             }
           />
 
-
         </div>
 
-          <div
-            style={{
-              color: "#666",
-              fontSize: 14,
-            }}
-          >
-            Cari anggota perpustakaan
-            lalu klik untuk lanjut
-            ke peminjaman buku
-          </div>
         {/* LOADING */}
 
         {loading && (
@@ -278,16 +490,6 @@ Cari nama / NIM / kode anggota...
               className="
 member-card glass-card
 "
-              onClick={() => {
-
-                navigate(
-                  "/borrow",
-                  {
-                    state: m
-                  }
-                );
-
-              }}
               style={{
                 borderRadius: 24,
                 padding: 22,
@@ -391,26 +593,266 @@ member-card glass-card
               >
 
                 <div>
-                  🎓 {m.nim}
+                  {m.nim}
                 </div>
 
                 <div>
-                  📚 {m.major}
+                  {m.major}
                 </div>
 
                 <div>
-                  📱 {m.phone}
+                  {m.phone}
                 </div>
 
               </div>
 
-              {/* BUTTON */}
+              {/* BUTTONS */}
+
+              <div
+                style={{
+                  display: "grid",
+                  gap: 10,
+                  marginTop: 20,
+                }}
+              >
+
+                {/* PILIH */}
+
+                <button
+                  onClick={() => {
+
+                    navigate(
+                      "/borrow",
+                      {
+                        state: m
+                      }
+                    );
+
+                  }}
+                  style={{
+                    width: "100%",
+
+                    background:
+                      "linear-gradient(135deg,#4f46e5,#7c3aed)",
+
+                    color: "#fff",
+
+                    border: "none",
+
+                    borderRadius: 16,
+
+                    padding:
+                      "14px 18px",
+
+                    fontWeight: 700,
+
+                    cursor: "pointer",
+                  }}
+                >
+                  Pilih Anggota
+                </button>
+
+                {/* EDIT DELETE */}
+
+                <div
+                  style={{
+                    display: "flex",
+                    gap: 10,
+                  }}
+                >
+
+                  {/* EDIT */}
+
+                  <button
+                    onClick={() =>
+                      startEdit(m)
+                    }
+                    style={{
+                      flex: 1,
+
+                      background:
+                        "#eef2ff",
+
+                      color:
+                        "#3730a3",
+
+                      border: "none",
+
+                      borderRadius: 14,
+
+                      padding: 12,
+
+                      fontWeight: 700,
+
+                      cursor: "pointer",
+                    }}
+                  >
+                    Edit
+                  </button>
+
+                  {/* DELETE */}
+
+                  <button
+                    onClick={() =>
+                      handleDelete(
+                        m.id
+                      )
+                    }
+                    style={{
+                      flex: 1,
+
+                      background:
+                        "#fee2e2",
+
+                      color:
+                        "#991b1b",
+
+                      border: "none",
+
+                      borderRadius: 14,
+
+                      padding: 12,
+
+                      fontWeight: 700,
+
+                      cursor: "pointer",
+                    }}
+                  >
+                    Hapus
+                  </button>
+
+                </div>
+
+              </div>
+
+            </div>
+
+          ))}
+
+        </div>
+
+      </div>
+
+      {/* ───────── EDIT MODAL ───────── */}
+
+      {editingMemberId && (
+
+        <div className="edit-modal">
+
+          <div className="edit-box">
+
+            <div
+              style={{
+                fontSize: 24,
+                fontWeight: 700,
+                marginBottom: 20,
+              }}
+            >
+              Edit Anggota
+            </div>
+
+            <div
+              style={{
+                display: "grid",
+                gap: 14,
+              }}
+            >
+
+              <input
+                className="modern-input"
+                placeholder="
+Kode anggota
+"
+                value={form.member_code}
+                onChange={(e) =>
+                  update(
+                    "member_code",
+                    e.target.value
+                  )
+                }
+              />
+
+              <input
+                className="modern-input"
+                placeholder="Nama"
+                value={form.name}
+                onChange={(e) =>
+                  update(
+                    "name",
+                    e.target.value
+                  )
+                }
+              />
+
+              <input
+                className="modern-input"
+                placeholder="NIM"
+                value={form.nim}
+                onChange={(e) =>
+                  update(
+                    "nim",
+                    e.target.value
+                  )
+                }
+              />
+
+              <input
+                className="modern-input"
+                placeholder="Jurusan"
+                value={form.major}
+                onChange={(e) =>
+                  update(
+                    "major",
+                    e.target.value
+                  )
+                }
+              />
+
+              <input
+                className="modern-input"
+                placeholder="
+No Telepon
+"
+                value={form.phone}
+                onChange={(e) =>
+                  update(
+                    "phone",
+                    e.target.value
+                  )
+                }
+              />
+
+              <textarea
+                className="modern-input"
+                rows={4}
+                placeholder="
+Alamat
+"
+                value={form.address}
+                onChange={(e) =>
+                  update(
+                    "address",
+                    e.target.value
+                  )
+                }
+              />
+
+            </div>
+
+            {/* BUTTON */}
+
+            <div
+              style={{
+                display: "flex",
+                gap: 12,
+                marginTop: 24,
+              }}
+            >
 
               <button
+                onClick={saveEdit}
                 style={{
-                  marginTop: 20,
-
-                  width: "100%",
+                  flex: 1,
 
                   background:
                     "linear-gradient(135deg,#4f46e5,#7c3aed)",
@@ -421,27 +863,52 @@ member-card glass-card
 
                   borderRadius: 16,
 
-                  padding:
-                    "14px 18px",
+                  padding: 14,
 
                   fontWeight: 700,
 
                   cursor: "pointer",
-
-                  boxShadow:
-                    "0 10px 22px rgba(79,70,229,.22)",
                 }}
               >
-                Pilih Anggota
+                Simpan
+              </button>
+
+              <button
+                onClick={() =>
+                  setEditingMemberId(
+                    null
+                  )
+                }
+                style={{
+                  flex: 1,
+
+                  background:
+                    "#f3f4f6",
+
+                  color:
+                    "#111827",
+
+                  border: "none",
+
+                  borderRadius: 16,
+
+                  padding: 14,
+
+                  fontWeight: 700,
+
+                  cursor: "pointer",
+                }}
+              >
+                Batal
               </button>
 
             </div>
 
-          ))}
+          </div>
 
         </div>
 
-      </div>
+      )}
 
     </>
   );

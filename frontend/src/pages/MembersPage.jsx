@@ -15,6 +15,9 @@ export default function MembersPage({
     const [members, setMembers] =
     useState([]);
 
+  const [editingMemberId, setEditingMemberId] =
+    useState(null);
+
   const [form, setForm] =
     useState({
       member_code: "",
@@ -47,16 +50,22 @@ export default function MembersPage({
 
   async function handleSubmit() {
 
+    const isEditing = editingMemberId !== null;
+
     setLoader(
       true,
-      "Menambahkan anggota..."
+      isEditing
+        ? "Menyimpan perubahan anggota..."
+        : "Menambahkan anggota..."
     );
 
     try {
 
       const r = await apiFetch(
-        "/members",
-        "POST",
+        isEditing
+          ? `/members/${editingMemberId}`
+          : "/members",
+        isEditing ? "PUT" : "POST",
         form
       );
 
@@ -71,6 +80,7 @@ export default function MembersPage({
         address: "",
       });
 
+      setEditingMemberId(null);
       loadMembers();
 
     } catch (e) {
@@ -90,6 +100,56 @@ export default function MembersPage({
       ...prev,
       [field]: value,
     }));
+  }
+
+  function startEdit(member) {
+    setForm({
+      member_code: member.member_code,
+      name: member.name,
+      nim: member.nim,
+      major: member.major,
+      phone: member.phone,
+      address: member.address,
+    });
+    setEditingMemberId(member.id);
+  }
+
+  function cancelEdit() {
+    setEditingMemberId(null);
+    setForm({
+      member_code: "",
+      name: "",
+      nim: "",
+      major: "",
+      phone: "",
+      address: "",
+    });
+  }
+
+  async function handleDelete(member) {
+    if (!window.confirm(`Hapus anggota ${member.name}?`)) {
+      return;
+    }
+
+    setLoader(true, "Menghapus anggota...");
+
+    try {
+      const r = await apiFetch(
+        `/members/${member.id}`,
+        "DELETE"
+      );
+
+      showToast(r.message, "ok");
+      loadMembers();
+
+      if (editingMemberId === member.id) {
+        cancelEdit();
+      }
+    } catch (e) {
+      showToast(e.message, "err");
+    } finally {
+      setLoader(false);
+    }
   }
 
   return (
@@ -255,7 +315,9 @@ export default function MembersPage({
               marginBottom: 24,
             }}
           >
-            Tambah Anggota
+            {editingMemberId
+              ? "Edit Anggota"
+              : "Tambah Anggota"}
           </div>
 
           <div className="form-grid">
@@ -335,27 +397,62 @@ export default function MembersPage({
 
           </div>
 
-          <button
-            onClick={handleSubmit}
-            className="submit-btn"
+          <div
             style={{
-              marginTop: 24,
-              width: "100%",
-              background:
-                "linear-gradient(135deg,#4f46e5,#7c3aed)",
-              color: "#fff",
-              border: "none",
-              borderRadius: 18,
-              padding: "16px 20px",
-              fontSize: 15,
-              fontWeight: 700,
-              cursor: "pointer",
-              boxShadow:
-                "0 10px 24px rgba(79,70,229,.24)",
+              display: "flex",
+              gap: 12,
+              flexWrap: "wrap",
+              alignItems: "center",
             }}
           >
-            + Tambah Anggota
-          </button>
+            <button
+              onClick={handleSubmit}
+              className="submit-btn"
+              style={{
+                marginTop: 24,
+                flex: 1,
+                minWidth: 180,
+                background:
+                  "linear-gradient(135deg,#4f46e5,#7c3aed)",
+                color: "#fff",
+                border: "none",
+                borderRadius: 18,
+                padding: "16px 20px",
+                fontSize: 15,
+                fontWeight: 700,
+                cursor: "pointer",
+                boxShadow:
+                  "0 10px 24px rgba(79,70,229,.24)",
+              }}
+            >
+              {editingMemberId
+                ? "Simpan Perubahan"
+                : "+ Tambah Anggota"}
+            </button>
+
+            {editingMemberId && (
+              <button
+                onClick={cancelEdit}
+                className="submit-btn"
+                style={{
+                  marginTop: 24,
+                  flex: 1,
+                  minWidth: 120,
+                  background: "#f3f4f6",
+                  color: "#111827",
+                  border: "none",
+                  borderRadius: 18,
+                  padding: "16px 20px",
+                  fontSize: 15,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  boxShadow: "0 10px 24px rgba(15,23,42,.08)",
+                }}
+              >
+                Batal
+              </button>
+            )}
+          </div>
 
         </div>
 
@@ -461,38 +558,83 @@ export default function MembersPage({
                     lineHeight: 1.8,
                 }}
                 >
-                <div>🎓 {m.nim}</div>
-                <div>📚 {m.major}</div>
-                <div>📱 {m.phone}</div>
+                <div>{m.nim}</div>
+                <div>{m.major}</div>
+                <div>{m.phone}</div>
                 </div>
 
-                <button
-                onClick={() => {
-
-                    setSelectedMember(m);
-
-                    navigate("/borrow", {
-                        state: m
-                    });
-
-                }}
-                style={{
+                <div
+                  style={{
+                    display: "grid",
+                    gap: 10,
                     marginTop: 16,
-                    width: "100%",
-                    background:
-                    "linear-gradient(135deg,#4f46e5,#7c3aed)",
-                    color: "#fff",
-                    border: "none",
-                    borderRadius: 14,
-                    padding: "12px",
-                    fontWeight: 700,
-                    cursor: "pointer",
-                }}
+                  }}
                 >
-                Gunakan Anggota
-                </button>
+                  <button
+                    onClick={() => {
+                      setSelectedMember(m);
+                      navigate("/borrow", {
+                        state: m,
+                      });
+                    }}
+                    style={{
+                      width: "100%",
+                      background:
+                        "linear-gradient(135deg,#4f46e5,#7c3aed)",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: 14,
+                      padding: "12px",
+                      fontWeight: 700,
+                      cursor: "pointer",
+                    }}
+                  >
+                    Gunakan Anggota
+                  </button>
 
-</div>
+                  <div
+                    style={{
+                      display: "flex",
+                      gap: 8,
+                      flexWrap: "wrap",
+                    }}
+                  >
+                    <button
+                      onClick={() => startEdit(m)}
+                      style={{
+                        flex: 1,
+                        minWidth: 120,
+                        background: "#eef2ff",
+                        color: "#3730a3",
+                        border: "1px solid rgba(79,70,229,.15)",
+                        borderRadius: 14,
+                        padding: "12px",
+                        fontWeight: 700,
+                        cursor: "pointer",
+                      }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(m)}
+                      style={{
+                        flex: 1,
+                        minWidth: 120,
+                        background: "#fee2e2",
+                        color: "#991b1b",
+                        border: "1px solid rgba(248,113,113,.3)",
+                        borderRadius: 14,
+                        padding: "12px",
+                        fontWeight: 700,
+                        cursor: "pointer",
+                      }}
+                    >
+                      Hapus
+                    </button>
+                  </div>
+                </div>
+
+              </div>
 
           ))}
 

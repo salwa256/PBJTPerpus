@@ -807,6 +807,83 @@ def add_member(data: MemberModel):
         f"Anggota '{data.name}' berhasil ditambahkan"
     }
 
+@app.put("/members/{member_id}")
+def update_member(member_id: int, data: MemberModel):
+
+    db = get_db()
+    cur = db.cursor()
+
+    try:
+        cur.execute("""
+            UPDATE members
+            SET
+                member_code=%s,
+                name=%s,
+                nim=%s,
+                major=%s,
+                phone=%s,
+                address=%s
+            WHERE id=%s
+        """, (
+            data.member_code,
+            data.name,
+            data.nim,
+            data.major,
+            data.phone,
+            data.address,
+            member_id,
+        ))
+
+        if cur.rowcount == 0:
+            db.close()
+            raise HTTPException(
+                status_code=404,
+                detail="Anggota tidak ditemukan"
+            )
+
+        db.commit()
+
+    except mysql.connector.IntegrityError:
+
+        db.close()
+
+        raise HTTPException(
+            status_code=400,
+            detail="Kode anggota sudah ada"
+        )
+
+    db.close()
+
+    return {
+        "message":
+        f"Anggota '{data.name}' berhasil diperbarui"
+    }
+
+@app.delete("/members/{member_id}")
+def delete_member(member_id: int):
+
+    db = get_db()
+    cur = db.cursor()
+
+    cur.execute("""
+        DELETE FROM members
+        WHERE id=%s
+    """, (member_id,))
+
+    if cur.rowcount == 0:
+        db.close()
+        raise HTTPException(
+            status_code=404,
+            detail="Anggota tidak ditemukan"
+        )
+
+    db.commit()
+    db.close()
+
+    return {
+        "message": "Anggota berhasil dihapus"
+    }
+
 @app.get("/members/search")
 def search_members(q: str = ""):
 

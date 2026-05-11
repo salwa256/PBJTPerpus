@@ -224,11 +224,7 @@ export default function HomePage({
       transition: .25s;
     }
 
-    .stat-card:hover .icon-box {
-      transform:
-        rotate(-6deg)
-        scale(1.08);
-    }
+   
 
     @media (max-width: 900px) {
 
@@ -970,7 +966,6 @@ function StatCards({
               "blur(12px)",
             border:
               "1px solid rgba(255,255,255,.3)",
-            borderRadius: 24,
             padding: 22,
           }}
         >
@@ -1075,7 +1070,6 @@ const tableWrapStyle = {
     "rgba(255,255,255,.92)",
   border:
     "1px solid rgba(255,255,255,.4)",
-  borderRadius: 24,
   overflow: "hidden",
   backdropFilter:
     "blur(12px)",

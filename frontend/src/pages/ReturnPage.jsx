@@ -42,14 +42,41 @@ export default function ReturnPage({
     useState("");
 
   const videoRef = useRef(null);
+  const scanIntervalRef = useRef(null);
 
   // ───────── INIT ─────────
 
   useEffect(() => {
-
+    startCamera();
     return () => stopCamera();
-
   }, []);
+
+  useEffect(() => {
+    if (!camStream) {
+      return;
+    }
+
+    if (scanIntervalRef.current) {
+      return;
+    }
+
+    scanIntervalRef.current = setInterval(() => {
+      if (
+        camStream &&
+        !isScanning &&
+        !detectedBook
+      ) {
+        captureAndDetect();
+      }
+    }, 5000);
+
+    return () => {
+      if (scanIntervalRef.current) {
+        clearInterval(scanIntervalRef.current);
+        scanIntervalRef.current = null;
+      }
+    };
+  }, [camStream, isScanning, detectedBook]);
 
   // ───────── CAMERA ─────────
 
@@ -74,6 +101,16 @@ export default function ReturnPage({
       );
 
       showToast("Kamera aktif", "ok");
+
+      setTimeout(() => {
+        if (
+          videoRef.current &&
+          !isScanning &&
+          !detectedBook
+        ) {
+          captureAndDetect();
+        }
+      }, 1200);
 
     } catch (e) {
 
@@ -100,6 +137,12 @@ export default function ReturnPage({
       }
 
       setCamStream(null);
+      setDetectedBook(null);
+
+      if (scanIntervalRef.current) {
+        clearInterval(scanIntervalRef.current);
+        scanIntervalRef.current = null;
+      }
 
       setScanLabel(
         "Aktifkan kamera terlebih dahulu"
@@ -628,7 +671,122 @@ export default function ReturnPage({
 
           )}
 
-          {/* DETECTED */}
+          {/* LOADING */}
+
+          {isScanning && (
+
+            <div
+              style={{
+                textAlign: "center",
+                padding: 30,
+                color: "#666",
+              }}
+            >
+
+              <div
+                style={{
+                  width: 34,
+                  height: 34,
+                  border:
+                    "3px solid #e5e7eb",
+                  borderTopColor:
+                    "#4f46e5",
+                  borderRadius:
+                    "50%",
+                  animation:
+                    "spin .7s linear infinite",
+                  margin:
+                    "0 auto 14px",
+                }}
+              />
+
+              AI sedang menganalisis
+              gambar...
+
+            </div>
+
+          )}
+
+        </div>
+
+        {/* ───────── RIGHT ───────── */}
+
+        <div
+          className="modern-card"
+          style={{
+            background:
+              "rgba(255,255,255,.92)",
+            backdropFilter:
+              "blur(12px)",
+            border:
+              "1px solid rgba(255,255,255,.4)",
+            borderRadius: 28,
+            padding: 30,
+            boxShadow:
+              "0 10px 30px rgba(0,0,0,.05)",
+            height: "fit-content",
+          }}
+        >
+
+          <div
+            style={{
+              fontSize: 24,
+              fontWeight: 700,
+              marginBottom: 10,
+            }}
+          >
+            Manual Return
+          </div>
+
+          <div
+            style={{
+              fontSize: 14,
+              color: "#666",
+              lineHeight: 1.7,
+              marginBottom: 22,
+            }}
+          >
+            Gunakan jika scan kamera
+            gagal mendeteksi buku.
+          </div>
+
+          <FormField label="ID Buku">
+
+            <input
+              value={manualId}
+              onChange={(e) =>
+                setManualId(
+                  e.target.value
+                )
+              }
+              onKeyDown={(e) =>
+                e.key === "Enter" &&
+                handleManualReturn()
+              }
+              placeholder="Contoh: BOOK-001"
+              style={{
+                ...inputStyle,
+                borderRadius: 14,
+                padding: 14,
+              }}
+              className="modern-input"
+            />
+
+          </FormField>
+
+          <button
+            onClick={
+              handleManualReturn
+            }
+            className="modern-btn"
+            style={{
+              ...btnPrimaryStyle,
+              width: "100%",
+              marginTop: 20,
+            }}
+          >
+            Proses Pengembalian
+          </button>
 
           {detectedBook && (
 
@@ -641,6 +799,7 @@ export default function ReturnPage({
                   "1px solid #86efac",
                 borderRadius: 22,
                 padding: 22,
+                marginTop: 24,
               }}
             >
 
@@ -761,87 +920,6 @@ export default function ReturnPage({
             </div>
 
           )}
-
-        </div>
-
-        {/* ───────── RIGHT ───────── */}
-
-        <div
-          className="modern-card"
-          style={{
-            background:
-              "rgba(255,255,255,.92)",
-            backdropFilter:
-              "blur(12px)",
-            border:
-              "1px solid rgba(255,255,255,.4)",
-            borderRadius: 28,
-            padding: 30,
-            boxShadow:
-              "0 10px 30px rgba(0,0,0,.05)",
-            height: "fit-content",
-          }}
-        >
-
-          <div
-            style={{
-              fontSize: 24,
-              fontWeight: 700,
-              marginBottom: 10,
-            }}
-          >
-            Manual Return
-          </div>
-
-          <div
-            style={{
-              fontSize: 14,
-              color: "#666",
-              lineHeight: 1.7,
-              marginBottom: 22,
-            }}
-          >
-            Gunakan jika scan kamera
-            gagal mendeteksi buku.
-          </div>
-
-          <FormField label="ID Buku">
-
-            <input
-              value={manualId}
-              onChange={(e) =>
-                setManualId(
-                  e.target.value
-                )
-              }
-              onKeyDown={(e) =>
-                e.key === "Enter" &&
-                handleManualReturn()
-              }
-              placeholder="Contoh: BOOK-001"
-              style={{
-                ...inputStyle,
-                borderRadius: 14,
-                padding: 14,
-              }}
-              className="modern-input"
-            />
-
-          </FormField>
-
-          <button
-            onClick={
-              handleManualReturn
-            }
-            className="modern-btn"
-            style={{
-              ...btnPrimaryStyle,
-              width: "100%",
-              marginTop: 20,
-            }}
-          >
-            Proses Pengembalian
-          </button>
 
         </div>
 
