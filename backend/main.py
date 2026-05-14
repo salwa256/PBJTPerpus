@@ -1,78 +1,62 @@
+# =========================
+# IMPORT
+# =========================
+
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
-import mysql.connector
-from datetime import date, datetime
-import httpx
-from fastapi import Query, UploadFile, File, Form
-from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
-import pandas as pd
-import shutil
+from pydantic import BaseModel
+
+from datetime import date, datetime
 from pathlib import Path
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
 from collections import Counter
+
+import pandas as pd
+import psycopg2
+import mysql.connector
+import shutil
 import uuid
 import os
-import pandas as pd
-import shutil
 
-from pathlib import Path
+from psycopg2.extras import RealDictCursor
 
 from sklearn.feature_extraction.text import TfidfVectorizer
-
 from sklearn.metrics.pairwise import cosine_similarity
 
-from collections import Counter
-
-import uuid
-
-from fastapi import (
-    UploadFile,
-    File,
-    Form,
-    Query
-)
-
-from fastapi.responses import HTMLResponse
-
-from fastapi.staticfiles import StaticFiles
+# =========================
+# APP
+# =========================
 
 app = FastAPI(title="Sistem Perpustakaan API")
 
-# ══════════════════════════════════════════════
+# =========================
 # CORS
-# ══════════════════════════════════════════════
-
-origins = [
-    "http://127.0.0.1:8000",
-    "http://localhost:3000"
-]
+# =========================
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# ══════════════════════════════════════════════
+# =========================
 # DATABASE
-# ══════════════════════════════════════════════
+# =========================
+
+DATABASE_URL = "postgresql://postgres.xlndpiygnorrgtupavmg:perpusbackend@aws-1-ap-southeast-1.pooler.supabase.com:6543/postgres?sslmode=require"
 
 def get_db():
-    return mysql.connector.connect(
-        host="localhost",
-        user="root",
-        password="",
-        database="perpuspbjt"
+
+    return psycopg2.connect(
+        DATABASE_URL,
+        cursor_factory=RealDictCursor
     )
 
-# ══════════════════════════════════════════════
+# =========================
 # MODELS
-# ══════════════════════════════════════════════
+# =========================
 
 class LoginModel(BaseModel):
     username: str
@@ -102,38 +86,33 @@ class ReturnModel(BaseModel):
 class ScanModel(BaseModel):
     image_base64: str
 
+
 class MemberModel(BaseModel):
-    member_code:str
+    member_code: str
     name: str
-    nim:str
-    major:str
-    phone:str
-    address:str
+    nim: str
+    major: str
+    phone: str
+    address: str
+
+# =========================
+# DATASET
+# =========================
 
 BASE_DIR = Path(__file__).resolve().parent
+
 DATASET_PATH = BASE_DIR / "dataset_buku.csv"
+
 IMAGES_DIR = BASE_DIR / "static/images"
 
 IMAGES_DIR.mkdir(parents=True, exist_ok=True)
 
-# =====================
-# INIT APP
-# =====================
-app = FastAPI(title="Sistem Rekomendasi Buku")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 app.mount("/images", StaticFiles(directory=IMAGES_DIR), name="images")
 
-# =====================
+# =========================
 # LOAD DATASET
-# =====================
+# =========================
+
 if DATASET_PATH.exists():
     df = pd.read_csv(DATASET_PATH)
 else:
@@ -150,14 +129,20 @@ else:
     ])
 
 df = df.fillna("")
+
 def normalize_filename(text):
+
     return text.lower().strip().replace(" ", "_")
 
+
 def find_existing_image(judul):
+
     base_name = normalize_filename(judul)
 
     for ext in ["jpg", "jpeg", "png", "webp"]:
+
         file_path = IMAGES_DIR / f"{base_name}.{ext}"
+
         if file_path.exists():
             return f"/images/{base_name}.{ext}"
 
@@ -165,36 +150,46 @@ def find_existing_image(judul):
 
 df["image_url"] = df["judul"].apply(find_existing_image)
 
-# =====================
-# TF-IDF SETUP
-# =====================
+# =========================
+# TFIDF
+# =========================
+
 vectorizer = TfidfVectorizer(stop_words=None)
+
 tfidf_matrix = None
 
 def update_tfidf():
+
     global tfidf_matrix
+
     if len(df) == 0:
         tfidf_matrix = None
         return
-    
+
     tfidf_matrix = vectorizer.fit_transform(df["content"])
 
 update_tfidf()
 
 search_log = Counter()
 
-# ══════════════════════════════════════════════
+# =========================
 # AUTH
-# ══════════════════════════════════════════════
+# =========================
 
 @app.post("/login")
 def login(data: LoginModel):
 
     db = get_db()
-    cur = db.cursor(dictionary=True)
+
+    cur = db.cursor()
 
     cur.execute(
-        "SELECT * FROM users WHERE username=%s AND password=%s",
+        """
+        SELECT *
+        FROM users
+        WHERE username=%s
+        AND password=%s
+        """,
         (data.username, data.password)
     )
 
@@ -203,6 +198,7 @@ def login(data: LoginModel):
     db.close()
 
     if user:
+
         return {
             "user_id": user["id"],
             "username": user["username"],
@@ -214,16 +210,16 @@ def login(data: LoginModel):
         detail="Username atau password salah"
     )
 
-
-# ══════════════════════════════════════════════
+# =========================
 # BOOKS
-# ══════════════════════════════════════════════
+# =========================
 
 @app.get("/books")
 def get_books():
 
     db = get_db()
-    cur = db.cursor(dictionary=True)
+
+    cur = db.cursor()
 
     cur.execute("""
         SELECT *
@@ -242,7 +238,8 @@ def get_books():
 def get_available_books():
 
     db = get_db()
-    cur = db.cursor(dictionary=True)
+
+    cur = db.cursor()
 
     cur.execute("""
         SELECT *
@@ -262,16 +259,17 @@ def get_available_books():
 def search_books(q: str = ""):
 
     db = get_db()
-    cur = db.cursor(dictionary=True)
+
+    cur = db.cursor()
 
     like = f"%{q}%"
 
     cur.execute("""
         SELECT *
         FROM books
-        WHERE title LIKE %s
-        OR author LIKE %s
-        OR id LIKE %s
+        WHERE title ILIKE %s
+        OR author ILIKE %s
+        OR id ILIKE %s
     """, (like, like, like))
 
     books = cur.fetchall()
@@ -279,6 +277,39 @@ def search_books(q: str = ""):
     db.close()
 
     return books
+
+@app.get("/members/search")
+def search_members(q: str = ""):
+
+    db = get_db()
+
+    cur = db.cursor()
+
+    keyword = f"%{q}%"
+
+    cur.execute("""
+        SELECT *
+        FROM members
+        WHERE
+            name ILIKE %s
+            OR nim ILIKE %s
+            OR member_code ILIKE %s
+        ORDER BY id DESC
+    """, (
+        keyword,
+        keyword,
+        keyword
+    ))
+
+    members = cur.fetchall()
+
+    db.close()
+
+    return members
+
+# =========================
+# RECOMMENDATION
+# =========================
 
 class RequestRekomendasi(BaseModel):
     genre: str
@@ -288,17 +319,27 @@ class RequestRekomendasi(BaseModel):
 def recommend(data: RequestRekomendasi):
 
     if tfidf_matrix is None:
-        return {"recommendations": [], "popular": []}
+
+        return {
+            "recommendations": [],
+            "popular": []
+        }
 
     query_text = f"{data.genre} {data.subgenre}".strip()
+
     query_vec = vectorizer.transform([query_text])
 
-    similarity = cosine_similarity(query_vec, tfidf_matrix)[0]
+    similarity = cosine_similarity(
+        query_vec,
+        tfidf_matrix
+    )[0]
+
     top_idx = similarity.argsort()[-5:][::-1]
 
     hasil = []
 
     for i in top_idx:
+
         row = df.iloc[i]
 
         hasil.append({
@@ -316,12 +357,15 @@ def recommend(data: RequestRekomendasi):
         "popular": [j for j, _ in search_log.most_common(5)]
     }
 
-
+# =========================
+# ADD BOOK
+# =========================
 
 @app.post("/books")
 def add_book(book: BookModel):
 
     db = get_db()
+
     cur = db.cursor()
 
     try:
@@ -366,12 +410,16 @@ def add_book(book: BookModel):
         f"Buku '{book.title}' berhasil ditambahkan"
     }
 
+# =========================
+# DELETE BOOK
+# =========================
 
 @app.delete("/books/{book_id}")
 def delete_book(book_id: str):
 
     db = get_db()
-    cur = db.cursor(dictionary=True)
+
+    cur = db.cursor()
 
     cur.execute(
         "SELECT status FROM books WHERE id=%s",
@@ -381,6 +429,7 @@ def delete_book(book_id: str):
     book = cur.fetchone()
 
     if not book:
+
         db.close()
 
         raise HTTPException(
@@ -389,6 +438,7 @@ def delete_book(book_id: str):
         )
 
     if book["status"] == "dipinjam":
+
         db.close()
 
         raise HTTPException(
@@ -409,16 +459,16 @@ def delete_book(book_id: str):
         "message": "Buku berhasil dihapus"
     }
 
-
-# ══════════════════════════════════════════════
+# =========================
 # LOANS
-# ══════════════════════════════════════════════
+# =========================
 
 @app.get("/loans")
 def get_loans():
 
     db = get_db()
-    cur = db.cursor(dictionary=True)
+
+    cur = db.cursor()
 
     cur.execute("""
         SELECT
@@ -436,7 +486,9 @@ def get_loans():
     db.close()
 
     for loan in loans:
+
         for k, v in loan.items():
+
             if isinstance(v, (date, datetime)):
                 loan[k] = str(v)
 
@@ -447,7 +499,8 @@ def get_loans():
 def get_active_loans():
 
     db = get_db()
-    cur = db.cursor(dictionary=True)
+
+    cur = db.cursor()
 
     cur.execute("""
         SELECT
@@ -466,186 +519,25 @@ def get_active_loans():
     db.close()
 
     for loan in loans:
+
         for k, v in loan.items():
+
             if isinstance(v, (date, datetime)):
                 loan[k] = str(v)
 
     return loans
 
-
-@app.post("/loans/borrow")
-def borrow_book(data: BorrowModel):
-
-    db = get_db()
-    cur = db.cursor(dictionary=True)
-
-    # cek anggota
-    print(data.member_id)
-    cur.execute("""
-            SELECT *
-            FROM members
-            WHERE member_code=%s
-        """, (data.member_id,))
-
-    member = cur.fetchone()
-
-    if not member:
-
-            db.close()
-
-            raise HTTPException(
-        status_code=400,
-        detail=
-        "Mahasiswa belum terdaftar sebagai anggota perpustakaan"
-    )
-
-    # cek buku
-    cur.execute(
-        "SELECT * FROM books WHERE id=%s",
-        (data.book_id,)
-    )
-
-    book = cur.fetchone()
-
-    if not book:
-        db.close()
-
-        raise HTTPException(
-            status_code=404,
-            detail="Buku tidak ditemukan"
-        )
-
-    if book["status"] != "tersedia":
-        db.close()
-
-        raise HTTPException(
-            status_code=400,
-            detail="Buku sedang tidak tersedia"
-        )
-
-    today = date.today().isoformat()
-
-    # insert peminjaman
-    cur.execute("""
-        INSERT INTO loans (
-            book_id,
-            user_id,
-            borrower_name,
-            member_id,
-            phone,
-            borrow_date,
-            due_date,
-            status
-        )
-        VALUES (
-            %s,
-            %s,
-            %s,
-            %s,
-            %s,
-            %s,
-            %s,
-            %s
-        )
-    """, (
-        data.book_id,
-        data.user_id,
-        data.borrower_name,
-        data.member_id,
-        data.phone,
-        today,
-        data.due_date,
-        "dipinjam"
-    ))
-
-    # update status buku
-    cur.execute("""
-        UPDATE books
-        SET status='dipinjam'
-        WHERE id=%s
-    """, (data.book_id,))
-
-    db.commit()
-
-    db.close()
-
-    return {
-        "message":
-        f"Buku '{book['title']}' berhasil dipinjam oleh {data.borrower_name}"
-    }
-
-
-@app.post("/loans/return")
-def return_book(data: ReturnModel):
-
-    db = get_db()
-    cur = db.cursor(dictionary=True)
-
-    cur.execute("""
-        SELECT
-            l.*,
-            b.title as book_title
-        FROM loans l
-        JOIN books b
-        ON l.book_id = b.id
-        WHERE l.book_id=%s
-        AND l.status IN ('dipinjam','terlambat')
-        ORDER BY l.borrow_date DESC
-        LIMIT 1
-    """, (data.book_id,))
-
-    loan = cur.fetchone()
-
-    if not loan:
-        db.close()
-
-        raise HTTPException(
-            status_code=404,
-            detail="Tidak ada peminjaman aktif"
-        )
-
-    today = date.today().isoformat()
-
-    cur.execute("""
-        UPDATE loans
-        SET
-            status='dikembalikan',
-            return_date=%s
-        WHERE id=%s
-    """, (
-        today,
-        loan["id"]
-    ))
-
-    # update status buku
-    cur.execute("""
-        UPDATE books
-        SET status='tersedia'
-        WHERE id=%s
-    """, (data.book_id,))
-
-    db.commit()
-
-    db.close()
-
-    for k, v in loan.items():
-        if isinstance(v, (date, datetime)):
-            loan[k] = str(v)
-
-    return {
-        "message":
-        f"Pengembalian '{loan['book_title']}' berhasil",
-        "loan": loan
-    }
-
+# =========================
+# STATS
+# =========================
 
 @app.get("/stats")
 def get_stats():
 
     db = get_db()
-    cur = db.cursor(dictionary=True)
 
-    # total buku
+    cur = db.cursor()
+
     cur.execute("""
         SELECT COUNT(*) as total
         FROM books
@@ -653,16 +545,14 @@ def get_stats():
 
     total = cur.fetchone()["total"]
 
-    # dipinjam
     cur.execute("""
-        SELECT COUNT(*) as c
-        FROM books
-        WHERE status='dipinjam'
+    SELECT COUNT(*) as c
+    FROM loans
+    WHERE status IN ('dipinjam', 'terlambat')
     """)
 
     borrowed = cur.fetchone()["c"]
 
-    # tersedia
     cur.execute("""
         SELECT COUNT(*) as c
         FROM books
@@ -671,17 +561,15 @@ def get_stats():
 
     available = cur.fetchone()["c"]
 
-    # update terlambat
     cur.execute("""
         UPDATE loans
         SET status='terlambat'
-        WHERE due_date < CURDATE()
+        WHERE due_date < CURRENT_DATE
         AND status='dipinjam'
     """)
 
     db.commit()
 
-    # total terlambat
     cur.execute("""
         SELECT COUNT(*) as c
         FROM loans
@@ -690,7 +578,6 @@ def get_stats():
 
     overdue = cur.fetchone()["c"]
 
-    # total anggota
     cur.execute("""
         SELECT COUNT(*) as c
         FROM members
@@ -708,39 +595,16 @@ def get_stats():
         "members": members
     }
 
-# ══════════════════════════════════════════════
-# USERS
-# ══════════════════════════════════════════════
-
-@app.get("/users")
-def get_users():
-
-    db = get_db()
-    cur = db.cursor(dictionary=True)
-
-    cur.execute("""
-        SELECT
-            id,
-            username,
-            role
-        FROM users
-    """)
-
-    users = cur.fetchall()
-
-    db.close()
-
-    return users
-
-# ══════════════════════════════════════════════
+# =========================
 # MEMBERS
-# ══════════════════════════════════════════════
+# =========================
 
 @app.get("/members")
 def get_members():
 
     db = get_db()
-    cur = db.cursor(dictionary=True)
+
+    cur = db.cursor()
 
     cur.execute("""
         SELECT *
@@ -756,9 +620,10 @@ def get_members():
 
 
 @app.post("/members")
-def add_member(data: MemberModel):
+def add_member(member: MemberModel):
 
     db = get_db()
+
     cur = db.cursor()
 
     try:
@@ -781,141 +646,256 @@ def add_member(data: MemberModel):
                 %s
             )
         """, (
-            data.member_code,
-            data.name,
-            data.nim,
-            data.major,
-            data.phone,
-            data.address
+            member.member_code,
+            member.name,
+            member.nim,
+            member.major,
+            member.phone,
+            member.address
         ))
 
         db.commit()
 
-    except mysql.connector.IntegrityError:
+        return {
+            "message": "Member berhasil ditambahkan"
+        }
 
-        db.close()
+    except Exception as e:
+
+        db.rollback()
+
+        print("MEMBER ERROR:")
+        print(e)
 
         raise HTTPException(
-            status_code=400,
-            detail="Kode anggota sudah ada"
+            status_code=500,
+            detail=str(e)
         )
+
+    finally:
+
+        db.close()
+# =========================
+# MEMBER ACTIVE LOANS
+# =========================
+
+@app.get("/member-loans/{nim}")
+def get_member_loans(nim: str):
+
+    db = get_db()
+
+    cur = db.cursor()
+
+    cur.execute("""
+        SELECT
+            l.*,
+            b.title as book_title,
+            b.author as book_author
+        FROM loans l
+        JOIN books b
+        ON l.book_id = b.id
+        WHERE l.nim = %s
+        AND l.status IN ('dipinjam', 'terlambat')
+        ORDER BY l.borrow_date DESC
+    """, (nim,))
+
+    loans = cur.fetchall()
 
     db.close()
 
-    return {
-        "message":
-        f"Anggota '{data.name}' berhasil ditambahkan"
-    }
+    for loan in loans:
 
-@app.put("/members/{member_id}")
-def update_member(member_id: int, data: MemberModel):
+        for k, v in loan.items():
+
+            if isinstance(v, (date, datetime)):
+                loan[k] = str(v)
+
+    return loans
+
+@app.post("/loans/borrow")
+def borrow_book(data: BorrowModel):
 
     db = get_db()
+
     cur = db.cursor()
 
     try:
-        cur.execute("""
-            UPDATE members
-            SET
-                member_code=%s,
-                name=%s,
-                nim=%s,
-                major=%s,
-                phone=%s,
-                address=%s
-            WHERE id=%s
-        """, (
-            data.member_code,
-            data.name,
-            data.nim,
-            data.major,
-            data.phone,
-            data.address,
-            member_id,
-        ))
 
-        if cur.rowcount == 0:
-            db.close()
+        # cek member
+        cur.execute("""
+            SELECT *
+            FROM members
+            WHERE member_code = %s
+        """, (data.member_id,))
+
+        member = cur.fetchone()
+
+        if not member:
+
             raise HTTPException(
                 status_code=404,
-                detail="Anggota tidak ditemukan"
+                detail="Member tidak ditemukan"
             )
+
+        # cek buku
+        cur.execute("""
+            SELECT *
+            FROM books
+            WHERE id = %s
+        """, (data.book_id,))
+
+        book = cur.fetchone()
+
+        if not book:
+
+            raise HTTPException(
+                status_code=404,
+                detail="Buku tidak ditemukan"
+            )
+
+        if book["status"] == "dipinjam":
+
+            raise HTTPException(
+                status_code=400,
+                detail="Buku sedang dipinjam"
+            )
+
+        today = date.today().isoformat()
+
+        # insert loan
+        cur.execute("""
+            INSERT INTO loans (
+                book_id,
+                user_id,
+                borrower_name,
+                nim,
+                member_id,
+                phone,
+                borrow_date,
+                due_date,
+                status
+            )
+            VALUES (
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                %s,
+                'dipinjam'
+            )
+        """, (
+            data.book_id,
+            data.user_id,
+            data.borrower_name,
+            member["nim"],
+            data.member_id,
+            data.phone,
+            today,
+            data.due_date
+        ))
+
+        # update status buku
+        cur.execute("""
+            UPDATE books
+            SET status = 'dipinjam'
+            WHERE id = %s
+        """, (data.book_id,))
 
         db.commit()
 
-    except mysql.connector.IntegrityError:
+        return {
+            "message": "Peminjaman berhasil"
+        }
+
+    except Exception as e:
+
+        db.rollback()
+
+        print("BORROW ERROR:")
+        print(e)
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
+
+    finally:
+
+        db.close()
+
+# =========================
+# RETURN BOOK
+# =========================
+
+@app.post("/loans/return")
+def return_book(data: ReturnModel):
+
+    db = get_db()
+
+    cur = db.cursor()
+
+    # cari peminjaman aktif
+    cur.execute("""
+        SELECT
+            l.*,
+            b.title as book_title
+        FROM loans l
+        JOIN books b
+        ON l.book_id = b.id
+        WHERE l.book_id = %s
+        AND l.status IN ('dipinjam', 'terlambat')
+        ORDER BY l.borrow_date DESC
+        LIMIT 1
+    """, (data.book_id,))
+
+    loan = cur.fetchone()
+
+    if not loan:
 
         db.close()
 
         raise HTTPException(
-            status_code=400,
-            detail="Kode anggota sudah ada"
+            status_code=404,
+            detail="Tidak ada peminjaman aktif"
         )
+
+    today = date.today().isoformat()
+
+    # update loan
+    cur.execute("""
+        UPDATE loans
+        SET
+            status = 'dikembalikan',
+            return_date = %s
+        WHERE id = %s
+    """, (
+        today,
+        loan["id"]
+    ))
+
+    # update status buku
+    cur.execute("""
+        UPDATE books
+        SET status = 'tersedia'
+        WHERE id = %s
+    """, (data.book_id,))
+
+    db.commit()
 
     db.close()
 
     return {
         "message":
-        f"Anggota '{data.name}' berhasil diperbarui"
+        f"Buku '{loan['book_title']}' berhasil dikembalikan"
     }
 
-@app.delete("/members/{member_id}")
-def delete_member(member_id: int):
 
-    db = get_db()
-    cur = db.cursor()
-
-    cur.execute("""
-        DELETE FROM members
-        WHERE id=%s
-    """, (member_id,))
-
-    if cur.rowcount == 0:
-        db.close()
-        raise HTTPException(
-            status_code=404,
-            detail="Anggota tidak ditemukan"
-        )
-
-    db.commit()
-    db.close()
-
-    return {
-        "message": "Anggota berhasil dihapus"
-    }
-
-@app.get("/members/search")
-def search_members(q: str = ""):
-
-    db = get_db()
-
-    cur = db.cursor(
-        dictionary=True
-    )
-
-    like = f"%{q}%"
-
-    cur.execute("""
-        SELECT *
-        FROM members
-        WHERE
-            name LIKE %s
-            OR nim LIKE %s
-            OR member_code LIKE %s
-    """, (
-        like,
-        like,
-        like
-    ))
-
-    data = cur.fetchall()
-
-    db.close()
-
-    return data
-# ══════════════════════════════════════════════
+# =========================
 # RUN SERVER
-# ══════════════════════════════════════════════
+# =========================
 
 if __name__ == "__main__":
 

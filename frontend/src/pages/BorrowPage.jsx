@@ -1,12 +1,24 @@
 // ═══════════════════════════════════════════════════════
 // pages/BorrowPage.jsx
+// SEARCH BUKU FIX LEBIH AKURAT & STABIL
 // ═══════════════════════════════════════════════════════
 
-import { useState, useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import {
+  useState,
+  useEffect
+} from "react";
 
-import { apiFetch } from "../utils/api";
-import { getTodayAndDueDate } from "../utils/helpers";
+import {
+  useLocation
+} from "react-router-dom";
+
+import {
+  apiFetch
+} from "../utils/api";
+
+import {
+  getTodayAndDueDate
+} from "../utils/helpers";
 
 import FormField, {
   inputStyle
@@ -18,12 +30,13 @@ export default function BorrowPage({
   setLoader,
 }) {
 
+  // ───────── ROUTER ─────────
+
   const location =
     useLocation();
-    
+
   const selectedMember =
     location.state;
-  // ───────── ROUTER ─────────
 
   // ───────── DATE ─────────
 
@@ -42,12 +55,7 @@ export default function BorrowPage({
       dueDate: due,
     });
 
-  // ───────── BOOKS ─────────
-
-  const [
-    availableBooks,
-    setAvailableBooks
-  ] = useState([]);
+  // ───────── SEARCH ─────────
 
   const [
     searchQuery,
@@ -59,38 +67,7 @@ export default function BorrowPage({
     setSearchResults
   ] = useState([]);
 
-  // ───────── LOAD BOOKS ─────────
-
-  async function loadAvailableBooks() {
-
-    try {
-
-      const res =
-        await apiFetch(
-          "/books/available"
-        );
-
-      setAvailableBooks(res);
-
-    } catch (e) {
-
-      showToast(
-        "Gagal memuat buku",
-        "err"
-      );
-
-    }
-  }
-
-  // ───────── EFFECT ─────────
-
-  useEffect(() => {
-
-    loadAvailableBooks();
-
-  }, []);
-
-  // ───────── AUTO FILL MEMBER ─────────
+  // ───────── LOAD MEMBER ─────────
 
   useEffect(() => {
 
@@ -108,9 +85,79 @@ export default function BorrowPage({
         phone:
           selectedMember.phone || "",
       }));
+
     }
 
   }, [selectedMember]);
+
+  // ═══════════════════════════════════════
+  // SEARCH STABIL
+  // ═══════════════════════════════════════
+
+  useEffect(() => {
+
+    const timeout =
+      setTimeout(() => {
+
+        if (
+          searchQuery.trim()
+        ) {
+
+          searchBooks();
+
+        } else {
+
+          setSearchResults([]);
+
+        }
+
+      }, 400);
+
+    return () =>
+      clearTimeout(timeout);
+
+  }, [searchQuery]);
+
+  // ───────── SEARCH BOOK ─────────
+
+  async function searchBooks() {
+
+    try {
+
+      const res =
+        await apiFetch(
+          "/books/search?q=" +
+          encodeURIComponent(
+            searchQuery
+          )
+        );
+
+      setSearchResults(res);
+
+    } catch (e) {
+
+      showToast(
+        "Gagal mencari buku",
+        "err"
+      );
+
+    }
+
+  }
+
+  // ───────── UPDATE FORM ─────────
+
+  function updateForm(
+    field,
+    value
+  ) {
+
+    setForm((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+
+  }
 
   // ───────── HANDLE BORROW ─────────
 
@@ -121,7 +168,6 @@ export default function BorrowPage({
       member,
       phone,
       bookId,
-      date,
       dueDate
     } = form;
 
@@ -130,7 +176,6 @@ export default function BorrowPage({
       !member ||
       !phone ||
       !bookId ||
-      !date ||
       !dueDate
     ) {
 
@@ -140,6 +185,7 @@ export default function BorrowPage({
       );
 
       return;
+
     }
 
     setLoader(
@@ -179,7 +225,7 @@ export default function BorrowPage({
         "ok"
       );
 
-      // reset
+      // RESET
 
       setForm({
         name: "",
@@ -192,7 +238,7 @@ export default function BorrowPage({
 
       setSearchQuery("");
 
-      loadAvailableBooks();
+      setSearchResults([]);
 
     } catch (e) {
 
@@ -206,50 +252,7 @@ export default function BorrowPage({
       setLoader(false);
 
     }
-  }
 
-  // ───────── SEARCH ─────────
-
-  async function handleSearch(q) {
-
-    if (!q.trim()) {
-
-      setSearchResults([]);
-
-      return;
-    }
-
-    try {
-
-      const res =
-        await apiFetch(
-          "/books/search?q=" +
-          encodeURIComponent(q)
-        );
-
-      setSearchResults(res);
-
-    } catch (e) {
-
-      showToast(
-        "Gagal mencari buku",
-        "err"
-      );
-
-    }
-  }
-
-  // ───────── UPDATE FORM ─────────
-
-  function updateForm(
-    field,
-    value
-  ) {
-
-    setForm((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
   }
 
   // ───────── UI ─────────
@@ -262,74 +265,104 @@ export default function BorrowPage({
       <style>{`
 
         .borrow-page {
-          animation: fadePage .5s ease;
+          animation:
+            fadePage .5s ease;
         }
 
         @keyframes fadePage {
 
           from {
             opacity: 0;
-            transform: translateY(20px);
+            transform:
+              translateY(20px);
           }
 
           to {
             opacity: 1;
-            transform: translateY(0);
+            transform:
+              translateY(0);
           }
 
         }
 
         .modern-card {
-          transition: .25s ease;
+
+          transition: none;
+
+          background:
+            rgba(255,255,255,.92);
+
+          backdrop-filter:
+            blur(14px);
+
+          border:
+            1px solid rgba(255,255,255,.4);
+
+          box-shadow:
+            0 10px 30px rgba(0,0,0,.05);
+
         }
 
-        .modern-card:hover {
-          transform: translateY(-4px);
-          box-shadow:
-            0 18px 34px
-            rgba(0,0,0,0.08);
-        }
 
         .modern-input {
+
           transition: .2s;
+
         }
 
         .modern-input:focus {
+
           border-color:
             #4f46e5 !important;
 
           box-shadow:
             0 0 0 4px
             rgba(79,70,229,.12);
+
         }
 
         .book-item {
+
           transition: .2s;
+
         }
 
         .book-item:hover {
-          background: #eef2ff;
+
+          background:
+            #eef2ff;
+
         }
 
         .modern-btn {
+
           transition: .2s;
+
         }
 
         .modern-btn:hover {
-          transform: scale(1.02);
+
+          transform:
+            scale(1.02);
+
           opacity: .95;
+
         }
 
         @media (max-width:768px) {
 
           .form-grid {
+
             grid-template-columns:
               1fr !important;
+
           }
 
         }
 
       `}</style>
+
+      {/* PAGE */}
 
       <div
         className="borrow-page"
@@ -341,21 +374,7 @@ export default function BorrowPage({
         <div
           className="modern-card"
           style={{
-            background:
-              "rgba(255,255,255,0.92)",
-
-            backdropFilter:
-              "blur(12px)",
-
-            border:
-              "1px solid rgba(255,255,255,0.4)",
-
-            borderRadius: 28,
-
             padding: 32,
-
-            boxShadow:
-              "0 10px 30px rgba(0,0,0,0.05)",
           }}
         >
 
@@ -367,15 +386,7 @@ export default function BorrowPage({
             }}
           >
 
-            <div
-              style={{
-                fontSize: 28,
-                fontWeight: 700,
-                marginBottom: 8,
-              }}
-            >
-              Form Peminjaman
-            </div>
+          
 
             <div
               style={{
@@ -384,7 +395,7 @@ export default function BorrowPage({
               }}
             >
               Isi data peminjam
-              dan pilih buku
+              dan buku yang akan dipinjam
             </div>
 
           </div>
@@ -395,6 +406,7 @@ export default function BorrowPage({
             className="form-grid"
             style={{
               display: "grid",
+
               gridTemplateColumns:
                 "1fr 1fr",
 
@@ -421,7 +433,6 @@ export default function BorrowPage({
                 placeholder="Nama lengkap"
                 style={{
                   ...inputStyle,
-                  borderRadius: 14,
                   padding: 14,
                 }}
                 className="modern-input"
@@ -443,10 +454,9 @@ export default function BorrowPage({
                     e.target.value
                   )
                 }
-                placeholder="MBR-001"
+                placeholder="23.1.9.0000"
                 style={{
                   ...inputStyle,
-                  borderRadius: 14,
                   padding: 14,
                 }}
                 className="modern-input"
@@ -468,23 +478,20 @@ export default function BorrowPage({
                     e.target.value
                   )
                 }
-                placeholder="08xxxxxxxxxx"
+                placeholder="081234567890"
                 style={{
                   ...inputStyle,
-                  borderRadius: 14,
                   padding: 14,
                 }}
                 className="modern-input"
               />
 
             </FormField>
-
-          </div>
-
-          {/* SEARCH */}
+            
+            {/* SEARCH */}
 
           <FormField
-            label="Cari Buku (ID / Judul)"
+            label="Cari Buku"
           >
 
             <input
@@ -495,19 +502,16 @@ export default function BorrowPage({
                   e.target.value
                 );
 
-                handleSearch(
-                  e.target.value
-                );
-
               }}
-              placeholder="Ketik ID atau judul buku..."
+              placeholder="Cari ID / judul buku..."
               style={{
                 ...inputStyle,
-                borderRadius: 14,
                 padding: 14,
               }}
               className="modern-input"
             />
+            </FormField>
+          </div>
 
             {/* RESULT */}
 
@@ -516,16 +520,16 @@ export default function BorrowPage({
               <div
                 style={{
                   marginTop: 12,
+
                   border:
                     "1px solid rgba(0,0,0,0.08)",
 
-                  borderRadius: 14,
 
                   overflow: "hidden",
 
                   background: "#fff",
 
-                  maxHeight: 240,
+                  maxHeight: 260,
 
                   overflowY: "auto",
                 }}
@@ -552,6 +556,7 @@ export default function BorrowPage({
                     className="book-item"
                     style={{
                       padding: 14,
+
                       borderBottom:
                         "1px solid rgba(0,0,0,0.06)",
 
@@ -584,15 +589,13 @@ export default function BorrowPage({
               </div>
 
             )}
-
-          </FormField>
-
           {/* DATE */}
 
           <div
             className="form-grid"
             style={{
               display: "grid",
+
               gridTemplateColumns:
                 "1fr 1fr",
 
@@ -604,6 +607,8 @@ export default function BorrowPage({
             }}
           >
 
+            {/* PINJAM */}
+
             <FormField
               label="Tanggal Pinjam"
             >
@@ -611,21 +616,18 @@ export default function BorrowPage({
               <input
                 type="date"
                 value={form.date}
-                onChange={(e) =>
-                  updateForm(
-                    "date",
-                    e.target.value
-                  )
-                }
+                disabled
                 style={{
                   ...inputStyle,
-                  borderRadius: 14,
                   padding: 14,
+                  background:
+                    "#f3f4f6",
                 }}
-                className="modern-input"
               />
 
             </FormField>
+
+            {/* JATUH TEMPO */}
 
             <FormField
               label="Jatuh Tempo"
@@ -642,7 +644,6 @@ export default function BorrowPage({
                 }
                 style={{
                   ...inputStyle,
-                  borderRadius: 14,
                   padding: 14,
                 }}
                 className="modern-input"
@@ -667,7 +668,7 @@ export default function BorrowPage({
 
               border: "none",
 
-              borderRadius: 16,
+              borderRadius: 14,
 
               padding:
                 "15px 20px",

@@ -132,7 +132,7 @@ export default function SearchBookPage({
 
         .book-card {
 
-          transition: .25s ease;
+          transition: none;
 
           cursor: pointer;
 
@@ -140,8 +140,7 @@ export default function SearchBookPage({
 
         .book-card:hover {
 
-          transform:
-            translateY(-4px);
+          
 
           box-shadow:
             0 16px 30px
@@ -318,9 +317,7 @@ search-btn
           results.length === 0 && (
 
           <div
-            className="
-glass-card
-"
+            className="glass-card"
             style={{
               padding: 24,
               borderRadius: 20,
@@ -349,7 +346,7 @@ book-card glass-card
               }
               style={{
                 borderRadius: 24,
-                padding: 22,
+                padding: 16,
                 position: "relative",
                 overflow: "hidden",
               }}
@@ -378,38 +375,69 @@ book-card glass-card
                 }}
               />
 
-              {/* ICON */}
+              {/* COVER */}
 
-              <div
-                style={{
-                  width: 68,
-                  height: 68,
-                  borderRadius: 20,
+<div
+  style={{
+    width: "100%",
 
-                  background:
-                    "linear-gradient(135deg,#4f46e5,#7c3aed)",
+    height: 280,
 
-                  display: "flex",
+    borderRadius: 18,
 
-                  alignItems:
-                    "center",
+    overflow: "hidden",
 
-                  justifyContent:
-                    "center",
+    marginBottom: 18,
 
-                  fontSize: 30,
+    background: "#f3f4f6",
 
-                  color: "#fff",
+    display: "flex",
 
-                  marginBottom: 18,
+    alignItems: "center",
 
-                  boxShadow:
-                    "0 10px 20px rgba(79,70,229,.24)",
-                }}
-              >
-                📘
-              </div>
+    justifyContent: "center",
 
+    color: "#9ca3af",
+
+    fontWeight: 700,
+
+    fontSize: 14,
+  }}
+>
+
+  {b.image_url ? (
+
+    <img
+      src={`http://127.0.0.1:8000${b.image_url}`}
+
+      alt={b.title}
+
+      style={{
+        width: "100%",
+
+        height: "100%",
+
+        objectFit: "cover",
+      }}
+
+      onError={(e) => {
+
+        e.target.style.display =
+          "none";
+
+        e.target.parentNode.innerHTML =
+          "GAMBAR TIDAK TERSEDIA";
+
+      }}
+    />
+
+  ) : (
+
+    "GAMBAR TIDAK TERSEDIA"
+
+  )}
+
+</div>
               {/* TITLE */}
 
               <div
@@ -431,7 +459,7 @@ book-card glass-card
                   marginBottom: 14,
                 }}
               >
-                ✍️ {b.author}
+                Penulis: {b.author}
               </div>
 
               {/* CATEGORY */}

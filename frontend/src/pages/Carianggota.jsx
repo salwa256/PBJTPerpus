@@ -394,27 +394,6 @@ export default function Carianggota({
           }}
         >
 
-          <div
-            style={{
-              fontSize: 30,
-              fontWeight: 800,
-              marginBottom: 8,
-            }}
-          >
-            Cari Anggota
-          </div>
-
-          <div
-            style={{
-              color: "#666",
-              fontSize: 14,
-            }}
-          >
-            Cari anggota perpustakaan
-            lalu klik untuk lanjut
-            ke peminjaman buku
-          </div>
-
         </div>
 
         {/* SEARCH */}

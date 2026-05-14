@@ -18,7 +18,8 @@ function Rekomendasi() {
     body {
       margin: 0;
       padding: 0;
-      font-family: Arial, sans-serif;
+      font-family: 'Plus Jakarta Sans',
+            sans-serif;
       background: #f3f3f3;
     }
 

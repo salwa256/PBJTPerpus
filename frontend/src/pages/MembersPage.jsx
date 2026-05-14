@@ -186,13 +186,13 @@ export default function MembersPage({
 
         .modern-input {
           width: 100%;
-          border: 1px solid #e5e7eb;
-          border-radius: 16px;
+          border: 1px RGB(0,0,0,0.2) solid;
           padding: 14px 16px;
+          border-radius: 8px;
           font-size: 14px;
           outline: none;
           transition: .2s;
-          background: #fff;
+          background: rgb(240, 239, 235);
           box-sizing: border-box;
         }
 
@@ -211,12 +211,10 @@ export default function MembersPage({
         }
 
         .member-card {
-          transition: .25s ease;
           animation: cardFade .4s ease;
         }
 
         .member-card:hover {
-          transform: translateY(-5px);
           box-shadow: 0 16px 30px rgba(0,0,0,.08);
         }
 
@@ -276,25 +274,6 @@ export default function MembersPage({
           }}
         >
 
-          <div
-            style={{
-              fontSize: 30,
-              fontWeight: 800,
-              marginBottom: 8,
-            }}
-          >
-            Data Anggota
-          </div>
-
-          <div
-            style={{
-              color: "#666",
-              fontSize: 14,
-            }}
-          >
-            Kelola data anggota perpustakaan
-          </div>
-
         </div>
 
         {/* ───────── FORM CARD ───────── */}
@@ -302,7 +281,6 @@ export default function MembersPage({
         <div
           className="glass-card"
           style={{
-            borderRadius: 28,
             padding: 28,
             marginBottom: 30,
           }}
@@ -321,6 +299,7 @@ export default function MembersPage({
           </div>
 
           <div className="form-grid">
+            
 
             <input
               className="modern-input"
@@ -416,7 +395,7 @@ export default function MembersPage({
                   "linear-gradient(135deg,#4f46e5,#7c3aed)",
                 color: "#fff",
                 border: "none",
-                borderRadius: 18,
+                borderRadius: 14,
                 padding: "16px 20px",
                 fontSize: 15,
                 fontWeight: 700,
@@ -441,7 +420,6 @@ export default function MembersPage({
                   background: "#f3f4f6",
                   color: "#111827",
                   border: "none",
-                  borderRadius: 18,
                   padding: "16px 20px",
                   fontSize: 15,
                   fontWeight: 700,

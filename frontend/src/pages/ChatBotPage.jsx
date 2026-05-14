@@ -51,8 +51,8 @@ function ChatBotPage() {
         body{
           margin:0;
           font-family:
-            Inter,
-            sans-serif;
+            'Plus Jakarta Sans',
+            sans-serif
         }
 
         .ai-page{

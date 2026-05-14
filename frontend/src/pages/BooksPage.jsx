@@ -261,14 +261,11 @@ export default function BooksPage({
             1px solid
             rgba(255,255,255,.4);
 
-          transition: .25s ease;
 
         }
 
         .glass-card:hover {
 
-          transform:
-            translateY(-5px);
 
           box-shadow:
             0 18px 34px
@@ -356,7 +353,6 @@ export default function BooksPage({
         <div
           className="glass-card"
           style={{
-            borderRadius: 28,
             padding: 28,
           }}
         >
@@ -368,16 +364,6 @@ export default function BooksPage({
               marginBottom: 24,
             }}
           >
-
-            <div
-              style={{
-                fontSize: 28,
-                fontWeight: 700,
-                marginBottom: 6,
-              }}
-            >
-              Tambah Koleksi
-            </div>
 
             <div
               style={{
@@ -421,7 +407,7 @@ export default function BooksPage({
                 placeholder="BOOK-001"
                 style={{
                   ...inputStyle,
-                  borderRadius: 14,
+                  borderRadius: 8,
                   padding: 14,
                 }}
                 className="modern-input"
@@ -444,7 +430,7 @@ export default function BooksPage({
                 placeholder="2025"
                 style={{
                   ...inputStyle,
-                  borderRadius: 14,
+                  borderRadius: 8,
                   padding: 14,
                 }}
                 className="modern-input"
@@ -467,7 +453,7 @@ export default function BooksPage({
                 placeholder="Judul koleksi"
                 style={{
                   ...inputStyle,
-                  borderRadius: 14,
+                  borderRadius: 8,
                   padding: 14,
                 }}
                 className="modern-input"
@@ -490,7 +476,7 @@ export default function BooksPage({
                 placeholder="Nama penulis"
                 style={{
                   ...inputStyle,
-                  borderRadius: 14,
+                  borderRadius: 8,
                   padding: 14,
                 }}
                 className="modern-input"
@@ -512,7 +498,7 @@ export default function BooksPage({
                 }
                 style={{
                   ...inputStyle,
-                  borderRadius: 14,
+                  borderRadius: 8,
                   padding: 14,
                 }}
                 className="modern-input"
@@ -544,7 +530,7 @@ export default function BooksPage({
                 }
                 style={{
                   ...inputStyle,
-                  borderRadius: 14,
+                  borderRadius: 8,
                   padding: 14,
                 }}
                 className="modern-input"
@@ -575,7 +561,7 @@ export default function BooksPage({
                 "#2f35d7",
               color: "#fff",
               border: "none",
-              borderRadius: 16,
+              borderRadius: 14,
               padding: "15px 20px",
               fontSize: 15,
               fontWeight: 700,
@@ -607,7 +593,6 @@ export default function BooksPage({
           <div
             className="glass-card"
             style={{
-              borderRadius: 28,
               overflow: "hidden",
             }}
           >

@@ -1,21 +1,24 @@
 // ═══════════════════════════════════════════════════════
-// pages/ReturnPage.jsx
-// Pengembalian modern + animasi hidup
+// src/pages/ReturnPage.jsx
+// FINAL SUPER FLEXIBLE OCR + INPUT MANUAL
 // ═══════════════════════════════════════════════════════
 
-import Tesseract from "tesseract.js";
 import {
-  useState,
   useEffect,
   useRef,
+  useState,
 } from "react";
 
-import { apiFetch } from "../utils/api";
-import { formatDate } from "../utils/helpers";
+import Tesseract
+from "tesseract.js";
 
-import FormField, {
-  inputStyle,
-} from "../components/FormField";
+import {
+  apiFetch,
+} from "../utils/api";
+
+import {
+  formatDate,
+} from "../utils/helpers";
 
 export default function ReturnPage({
   showToast,
@@ -24,932 +27,754 @@ export default function ReturnPage({
 
   // ───────── STATE ─────────
 
-  const [camStream, setCamStream] =
+  const videoRef =
+    useRef(null);
+
+  const canvasRef =
+    useRef(null);
+
+  const [member, setMember] =
     useState(null);
 
-  const [scanLabel, setScanLabel] =
-    useState(
-      "Aktifkan kamera terlebih dahulu"
-    );
+  const [loans, setLoans] =
+    useState([]);
 
-  const [isScanning, setIsScanning] =
+  const [scanning, setScanning] =
     useState(false);
 
-  const [detectedBook, setDetectedBook] =
-    useState(null);
-
-  const [manualId, setManualId] =
+  const [manualNim, setManualNim] =
     useState("");
 
-  const videoRef = useRef(null);
-  const scanIntervalRef = useRef(null);
-
-  // ───────── INIT ─────────
+  // ───────── START CAMERA ─────────
 
   useEffect(() => {
-    startCamera();
-    return () => stopCamera();
-  }, []);
 
-  useEffect(() => {
-    if (!camStream) {
-      return;
-    }
+    let stream;
 
-    if (scanIntervalRef.current) {
-      return;
-    }
+    async function startCamera() {
 
-    scanIntervalRef.current = setInterval(() => {
-      if (
-        camStream &&
-        !isScanning &&
-        !detectedBook
-      ) {
-        captureAndDetect();
-      }
-    }, 5000);
+      try {
 
-    return () => {
-      if (scanIntervalRef.current) {
-        clearInterval(scanIntervalRef.current);
-        scanIntervalRef.current = null;
-      }
-    };
-  }, [camStream, isScanning, detectedBook]);
+        stream =
+          await navigator
+            .mediaDevices
+            .getUserMedia({
+              video: {
+                facingMode:
+                  "environment",
+              },
+              audio: false,
+            });
 
-  // ───────── CAMERA ─────────
+        if (videoRef.current) {
 
-  async function startCamera() {
+          videoRef.current.srcObject =
+            stream;
 
-    try {
-
-      const stream =
-        await navigator.mediaDevices.getUserMedia({
-          video: {
-            facingMode: "environment",
-          },
-        });
-
-      videoRef.current.srcObject =
-        stream;
-
-      setCamStream(stream);
-
-      setScanLabel(
-        "Arahkan ke cover buku"
-      );
-
-      showToast("Kamera aktif", "ok");
-
-      setTimeout(() => {
-        if (
-          videoRef.current &&
-          !isScanning &&
-          !detectedBook
-        ) {
-          captureAndDetect();
         }
-      }, 1200);
 
-    } catch (e) {
+      } catch (e) {
 
-      showToast(
-        "Gagal akses kamera: " +
-        e.message,
-        "err"
-      );
-
-    }
-  }
-
-  function stopCamera() {
-
-    if (camStream) {
-
-      camStream
-        .getTracks()
-        .forEach((t) => t.stop());
-
-      if (videoRef.current) {
-        videoRef.current.srcObject =
-          null;
-      }
-
-      setCamStream(null);
-      setDetectedBook(null);
-
-      if (scanIntervalRef.current) {
-        clearInterval(scanIntervalRef.current);
-        scanIntervalRef.current = null;
-      }
-
-      setScanLabel(
-        "Aktifkan kamera terlebih dahulu"
-      );
-    }
-  }
-
-  // ───────── OCR ─────────
-
-  async function captureAndDetect() {
-
-    const video = videoRef.current;
-
-    const canvas =
-      document.createElement("canvas");
-
-    canvas.width = video.videoWidth;
-    canvas.height = video.videoHeight;
-
-    canvas
-      .getContext("2d")
-      .drawImage(video, 0, 0);
-
-    setIsScanning(true);
-
-    setDetectedBook(null);
-
-    setScanLabel(
-      "Membaca cover buku..."
-    );
-
-    try {
-
-      const {
-        data: { text },
-      } = await Tesseract.recognize(
-        canvas,
-        "ind"
-      );
-
-      const scannedText =
-        text.toLowerCase().trim();
-
-      if (!scannedText) {
-
-        throw new Error(
-          "Tidak ada teks terbaca"
-        );
-      }
-
-      setScanLabel(
-        "Mencari buku..."
-      );
-
-      const activeLoans =
-        await apiFetch(
-          "/loans/active"
-        );
-
-      const matched =
-        activeLoans.find((loan) => {
-
-          const title =
-            loan.book_title.toLowerCase();
-
-          const firstWord =
-            title.split(" ")[0];
-
-          return (
-            scannedText.includes(title) ||
-            scannedText.includes(firstWord)
-          );
-        });
-
-      if (matched) {
-
-        setDetectedBook(matched);
-
-        setScanLabel(
-          "✓ Buku berhasil dideteksi"
-        );
+        console.error(e);
 
         showToast(
-          "Buku berhasil dideteksi",
-          "ok"
-        );
-
-      } else {
-
-        setScanLabel(
-          "Buku tidak ditemukan"
-        );
-
-        showToast(
-          "Buku tidak ditemukan",
+          "Camera tidak bisa diakses",
           "err"
         );
+
       }
 
-    } catch (e) {
-
-      setScanLabel(
-        "Gagal membaca cover"
-      );
-
-      showToast(
-        "Gagal memindai: " +
-        e.message,
-        "err"
-      );
-
-    } finally {
-
-      setIsScanning(false);
-
     }
-  }
 
-  // ───────── RETURN ─────────
+    startCamera();
 
-  async function processReturn(
-    bookId
+    return () => {
+
+      if (stream) {
+
+        stream
+          .getTracks()
+          .forEach(
+            (track) =>
+              track.stop()
+          );
+
+      }
+
+    };
+
+  }, []);
+
+  // ───────── FETCH DATA ─────────
+
+  async function fetchLoans(
+    nim
   ) {
-
-    setLoader(
-      true,
-      "Memproses pengembalian..."
-    );
 
     try {
 
-      const r = await apiFetch(
-        "/loans/return",
-        "POST",
-        {
-          book_id: bookId,
-        }
+      setLoader(
+        true,
+        "Mengambil data..."
       );
 
-      showToast(r.message, "ok");
+      const data =
+        await apiFetch(
+          "/member-loans/" +
+          nim
+        );
 
-      setDetectedBook(null);
+      if (!data.length) {
 
-      setScanLabel(
-        "Arahkan ke cover buku"
+        showToast(
+          "Tidak ada peminjaman aktif",
+          "err"
+        );
+
+        return;
+
+      }
+
+      setMember(data[0]);
+
+      setLoans(data);
+
+      showToast(
+        "Data ditemukan",
+        "ok"
       );
 
     } catch (e) {
 
-      showToast(e.message, "err");
+      console.error(e);
+
+      showToast(
+        e.message ||
+        "Data tidak ditemukan",
+        "err"
+      );
 
     } finally {
 
       setLoader(false);
 
     }
+
   }
 
-  async function handleManualReturn() {
+  // ───────── FORMAT NIM ─────────
 
-    if (!manualId.trim()) {
+  function formatNim(
+    raw
+  ) {
+
+    // HAPUS SEMUA SELAIN ANGKA
+    const digits =
+      raw.replace(/\D/g, "");
+
+    // FORMAT:
+    // 23190024
+    // MENJADI:
+    // 23.1.9.0024
+
+    if (
+      digits.length === 8
+    ) {
+
+      return (
+        `${digits.slice(0,2)}.` +
+        `${digits.slice(2,3)}.` +
+        `${digits.slice(3,4)}.` +
+        `${digits.slice(4)}`
+      );
+
+    }
+
+    return raw;
+
+  }
+
+  // ───────── OCR SCAN ─────────
+
+  async function scanCard() {
+
+    try {
+
+      setScanning(true);
+
+      const video =
+        videoRef.current;
+
+      const canvas =
+        canvasRef.current;
+
+      const ctx =
+        canvas.getContext("2d");
+
+      canvas.width =
+        video.videoWidth;
+
+      canvas.height =
+        video.videoHeight;
+
+      // FILTER AGAR OCR LEBIH AKURAT
+      ctx.filter =
+        "grayscale(100%) contrast(200%)";
+
+      ctx.drawImage(
+        video,
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
 
       showToast(
-        "Masukkan ID buku",
+        "Membaca kartu...",
+        "ok"
+      );
+
+      // OCR
+      const result =
+        await Tesseract
+          .recognize(
+            canvas,
+            "eng"
+          );
+
+      const text =
+        result.data.text;
+
+      console.log(
+        "OCR TEXT:",
+        text
+      );
+
+      // HAPUS SPASI
+      const cleanedText =
+        text.replace(/\s/g, "");
+
+      // DETEKSI NIM
+      const nimMatch =
+
+        // FORMAT:
+        // 23190024
+        cleanedText.match(
+          /\d{8}/
+        )
+
+        ||
+
+        // FORMAT:
+        // 23.19.0024
+        cleanedText.match(
+          /\d{2}\.\d{2}\.\d{4}/
+        )
+
+        ||
+
+        // FORMAT:
+        // 23.1.9.0024
+        cleanedText.match(
+          /\d{2}\.\d\.\d\.\d{4}/
+        );
+
+      if (!nimMatch) {
+
+        showToast(
+          "NIM tidak ditemukan",
+          "err"
+        );
+
+        setScanning(false);
+
+        return;
+
+      }
+
+      // FORMAT OTOMATIS
+      let nim =
+        formatNim(
+          nimMatch[0]
+        );
+
+      console.log(
+        "FORMAT NIM:",
+        nim
+      );
+
+      // AUTO ISI INPUT
+      setManualNim(nim);
+
+      // FETCH DATA
+      await fetchLoans(
+        nim
+      );
+
+    } catch (e) {
+
+      console.error(e);
+
+      showToast(
+        "Gagal scan kartu",
+        "err"
+      );
+
+    } finally {
+
+      setScanning(false);
+
+    }
+
+  }
+
+  // ───────── SEARCH MANUAL ─────────
+
+  async function searchManual() {
+
+    if (!manualNim) {
+
+      showToast(
+        "Masukkan NIM",
         "err"
       );
 
       return;
+
     }
 
-    await processReturn(
-      manualId.trim()
+    const formattedNim =
+      formatNim(
+        manualNim
+      );
+
+    setManualNim(
+      formattedNim
     );
 
-    setManualId("");
+    await fetchLoans(
+      formattedNim
+    );
+
+  }
+
+  // ───────── RETURN BOOK ─────────
+
+  async function processReturn(
+    bookId
+  ) {
+
+    try {
+
+      setLoader(
+        true,
+        "Memproses pengembalian..."
+      );
+
+      const response =
+        await apiFetch(
+          "/loans/return",
+          "POST",
+          {
+            book_id: bookId,
+          }
+        );
+
+      showToast(
+        response.message,
+        "ok"
+      );
+
+      // UPDATE UI
+      const updatedLoans =
+        loans.filter(
+          (loan) =>
+            loan.book_id !==
+            bookId
+        );
+
+      setLoans(
+        updatedLoans
+      );
+
+      // KOSONGKAN MEMBER
+      if (
+        updatedLoans.length === 0
+      ) {
+
+        setMember(null);
+
+      }
+
+    } catch (e) {
+
+      console.error(e);
+
+      showToast(
+        "Gagal mengembalikan buku",
+        "err"
+      );
+
+    } finally {
+
+      setLoader(false);
+
+    }
+
   }
 
   // ───────── UI ─────────
 
   return (
     <>
-      {/* ───────── ANIMATION STYLE ───────── */}
-
       <style>{`
 
         .return-page {
-          animation: fadePage .5s ease;
-        }
 
-        @keyframes fadePage {
+          display: grid;
 
-          from {
-            opacity: 0;
-            transform: translateY(20px);
-          }
+          grid-template-columns:
+            1fr 1fr;
 
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
+          gap: 24px;
 
         }
 
-        .modern-card {
-          transition: .25s ease;
-        }
+        .card {
 
-        .modern-card:hover {
-          transform: translateY(-4px);
-          box-shadow:
-            0 18px 34px rgba(0,0,0,.08);
-        }
+          background: #fff;
 
-        .modern-btn {
-          transition: .2s;
-        }
+          border-radius: 28px;
 
-        .modern-btn:hover {
-          transform: scale(1.03);
-          opacity: .95;
-        }
-
-        .modern-input {
-          transition: .2s;
-        }
-
-        .modern-input:focus {
-          border-color:
-            #4f46e5 !important;
+          padding: 28px;
 
           box-shadow:
-            0 0 0 4px
-            rgba(79,70,229,.12);
-        }
-
-        .scan-frame {
-          animation:
-            pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-
-          0% {
-            box-shadow:
-              0 0 0 0
-              rgba(124,58,237,.4);
-          }
-
-          70% {
-            box-shadow:
-              0 0 0 18px
-              rgba(124,58,237,0);
-          }
-
-          100% {
-            box-shadow:
-              0 0 0 0
-              rgba(124,58,237,0);
-          }
+            0 10px 30px
+            rgba(0,0,0,.05);
 
         }
 
-        .floating-card {
-          animation:
-            floatCard 3s ease-in-out infinite;
+        .scan-btn {
+
+          width: 100%;
+
+          padding: 16px;
+
+          border: none;
+
+          border-radius: 16px;
+
+          background:
+            linear-gradient(
+              135deg,
+              #4f46e5,
+              #7c3aed
+            );
+
+          color: white;
+
+          font-size: 16px;
+
+          font-weight: 700;
+
+          cursor: pointer;
+
+          transition: .2s;
+
+          margin-top: 16px;
+
         }
 
-        @keyframes floatCard {
+        .scan-btn:hover {
 
-          0% {
-            transform: translateY(0);
-          }
-
-          50% {
-            transform: translateY(-6px);
-          }
-
-          100% {
-            transform: translateY(0);
-          }
+          transform:
+            scale(1.02);
 
         }
 
-        @media (max-width: 900px) {
+        .manual-input {
 
-          .return-grid {
+          width: 100%;
+
+          padding: 14px;
+
+          border:
+            1px solid #ddd;
+
+          border-radius: 14px;
+
+          font-size: 15px;
+
+          margin-top: 18px;
+
+          outline: none;
+
+        }
+
+        .book-card {
+
+          border:
+            1px solid #eee;
+
+          border-radius: 18px;
+
+          padding: 18px;
+
+          margin-top: 18px;
+
+        }
+
+        .return-btn {
+
+          width: 100%;
+
+          padding: 14px;
+
+          border: none;
+
+          border-radius: 14px;
+
+          background:
+            #4f46e5;
+
+          color: white;
+
+          font-weight: 700;
+
+          cursor: pointer;
+
+          margin-top: 14px;
+
+        }
+
+        @media
+        (max-width:900px) {
+
+          .return-page {
+
             grid-template-columns:
-              1fr !important;
+              1fr;
+
           }
 
         }
 
       `}</style>
 
-      <div
-        className="return-page return-grid"
-        style={{
-          display: "grid",
-          gridTemplateColumns:
-            "1.1fr .9fr",
-          gap: 24,
-        }}
-      >
+      <div className="return-page">
 
-        {/* ───────── LEFT ───────── */}
+        {/* LEFT */}
 
-        <div
-          className="modern-card"
-          style={{
-            background:
-              "rgba(255,255,255,.92)",
-            backdropFilter:
-              "blur(12px)",
-            border:
-              "1px solid rgba(255,255,255,.4)",
-            borderRadius: 28,
-            padding: 30,
-            boxShadow:
-              "0 10px 30px rgba(0,0,0,.05)",
-          }}
-        >
+        <div className="card">
 
-          {/* HEADER */}
 
-          <div
+          <p
             style={{
-              marginBottom: 24,
+              color: "#666",
+              marginBottom: 20,
             }}
           >
+            Scan kartu anggota
+            atau masukkan NIM secara manual.
+          </p>
 
-            <div
-              style={{
-                fontSize: 28,
-                fontWeight: 700,
-                marginBottom: 8,
-              }}
-            >
-              Pengembalian Buku
-            </div>
-
-            <div
-              style={{
-                fontSize: 14,
-                color: "#666",
-                lineHeight: 1.7,
-              }}
-            >
-              Scan cover buku atau input manual.
-            </div>
-
-          </div>
-
-          {/* VIDEO */}
+          {/* CAMERA */}
 
           <div
             style={{
-              position: "relative",
-              borderRadius: 26,
+              border:
+                "2px dashed #c4b5fd",
+
+              borderRadius: 24,
+
               overflow: "hidden",
-              background: "#111",
-              aspectRatio: "4/3",
-              marginBottom: 24,
+
+              padding: 10,
+
+              background:
+                "#faf5ff",
             }}
           >
 
             <video
               ref={videoRef}
               autoPlay
-              muted
               playsInline
+              muted
               style={{
                 width: "100%",
-                height: "100%",
-                objectFit: "cover",
+                borderRadius: 18,
               }}
             />
 
-            {/* SCANNER */}
-
-            <div
-              style={{
-                position: "absolute",
-                inset: 0,
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                flexDirection: "column",
-              }}
-            >
-
-              <div
-                className="scan-frame"
-                style={{
-                  width: 200,
-                  height: 200,
-                  border:
-                    "3px solid rgba(124,58,237,.9)",
-                  borderRadius: 20,
-                  position: "relative",
-                }}
-              >
-
-                <div
-                  style={{
-                    position: "absolute",
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: 3,
-                    background:
-                      "linear-gradient(90deg,transparent,#7c3aed,transparent)",
-                    animation:
-                      "scan 1.8s linear infinite",
-                  }}
-                />
-
-              </div>
-
-              <div
-                style={{
-                  marginTop: 14,
-                  background:
-                    "rgba(0,0,0,.55)",
-                  color: "#fff",
-                  padding:
-                    "8px 16px",
-                  borderRadius: 999,
-                  fontSize: 13,
-                }}
-              >
-                {scanLabel}
-              </div>
-
-            </div>
-
           </div>
 
-          {/* BUTTONS */}
+          {/* HIDDEN CANVAS */}
 
-          <div
+          <canvas
+            ref={canvasRef}
             style={{
-              display: "flex",
-              gap: 12,
-              justifyContent:
-                "center",
-              flexWrap: "wrap",
-              marginBottom: 24,
+              display: "none",
+            }}
+          />
+
+          {/* BUTTON OCR */}
+
+          <button
+            onClick={scanCard}
+            className="scan-btn"
+            disabled={scanning}
+            style={{
+              opacity:
+                scanning
+                  ? .7
+                  : 1,
             }}
           >
 
-            {!camStream && (
+            {scanning
+              ? "Membaca Kartu..."
+              : "Scan Kartu"}
 
-              <button
-                onClick={startCamera}
-                className="modern-btn"
-                style={
-                  btnPrimaryStyle
-                }
-              >
-                ▶ Aktifkan Kamera
-              </button>
+          </button>
 
-            )}
+          {/* INPUT MANUAL */}
 
-            {camStream && (
-              <>
-                <button
-                  onClick={stopCamera}
-                  className="modern-btn"
-                  style={
-                    btnOutlineStyle
-                  }
-                >
-                  ⏹ Stop
-                </button>
+          <input
+            type="text"
+            className="manual-input"
+            placeholder="23.1.9.0000"
+            value={manualNim}
+            onChange={(e) =>
+              setManualNim(
+                e.target.value
+              )
+            }
+          />
 
-                <button
-                  onClick={
-                    captureAndDetect
-                  }
-                  className="modern-btn"
-                  style={
-                    btnPrimaryStyle
-                  }
-                >
-                  Scan Buku
-                </button>
-              </>
-            )}
+          {/* BUTTON MANUAL */}
 
-          </div>
-
-          {/* LOADING */}
-
-          {isScanning && (
-
-            <div
-              style={{
-                textAlign: "center",
-                padding: 30,
-                color: "#666",
-              }}
-            >
-
-              <div
-                style={{
-                  width: 34,
-                  height: 34,
-                  border:
-                    "3px solid #e5e7eb",
-                  borderTopColor:
-                    "#4f46e5",
-                  borderRadius:
-                    "50%",
-                  animation:
-                    "spin .7s linear infinite",
-                  margin:
-                    "0 auto 14px",
-                }}
-              />
-
-              AI sedang menganalisis
-              gambar...
-
-            </div>
-
-          )}
-
-          {/* LOADING */}
-
-          {isScanning && (
-
-            <div
-              style={{
-                textAlign: "center",
-                padding: 30,
-                color: "#666",
-              }}
-            >
-
-              <div
-                style={{
-                  width: 34,
-                  height: 34,
-                  border:
-                    "3px solid #e5e7eb",
-                  borderTopColor:
-                    "#4f46e5",
-                  borderRadius:
-                    "50%",
-                  animation:
-                    "spin .7s linear infinite",
-                  margin:
-                    "0 auto 14px",
-                }}
-              />
-
-              AI sedang menganalisis
-              gambar...
-
-            </div>
-
-          )}
+          <button
+            onClick={searchManual}
+            className="scan-btn"
+          >
+            Cari Manual
+          </button>
 
         </div>
 
-        {/* ───────── RIGHT ───────── */}
+        {/* RIGHT */}
 
-        <div
-          className="modern-card"
-          style={{
-            background:
-              "rgba(255,255,255,.92)",
-            backdropFilter:
-              "blur(12px)",
-            border:
-              "1px solid rgba(255,255,255,.4)",
-            borderRadius: 28,
-            padding: 30,
-            boxShadow:
-              "0 10px 30px rgba(0,0,0,.05)",
-            height: "fit-content",
-          }}
-        >
+        <div className="card">
 
-          <div
-            style={{
-              fontSize: 24,
-              fontWeight: 700,
-              marginBottom: 10,
-            }}
-          >
-            Manual Return
-          </div>
-
-          <div
-            style={{
-              fontSize: 14,
-              color: "#666",
-              lineHeight: 1.7,
-              marginBottom: 22,
-            }}
-          >
-            Gunakan jika scan kamera
-            gagal mendeteksi buku.
-          </div>
-
-          <FormField label="ID Buku">
-
-            <input
-              value={manualId}
-              onChange={(e) =>
-                setManualId(
-                  e.target.value
-                )
-              }
-              onKeyDown={(e) =>
-                e.key === "Enter" &&
-                handleManualReturn()
-              }
-              placeholder="Contoh: BOOK-001"
-              style={{
-                ...inputStyle,
-                borderRadius: 14,
-                padding: 14,
-              }}
-              className="modern-input"
-            />
-
-          </FormField>
-
-          <button
-            onClick={
-              handleManualReturn
-            }
-            className="modern-btn"
-            style={{
-              ...btnPrimaryStyle,
-              width: "100%",
-              marginTop: 20,
-            }}
-          >
-            Proses Pengembalian
-          </button>
-
-          {detectedBook && (
+          {!member && (
 
             <div
-              className="floating-card"
               style={{
-                background:
-                  "linear-gradient(135deg,#ecfdf5,#dcfce7)",
-                border:
-                  "1px solid #86efac",
-                borderRadius: 22,
-                padding: 22,
-                marginTop: 24,
+                textAlign: "center",
+                marginTop: 100,
               }}
             >
 
               <div
                 style={{
-                  fontSize: 18,
-                  fontWeight: 700,
-                  color: "#15803d",
-                  marginBottom: 18,
+                  fontSize: 70,
                 }}
               >
-                ✅ Buku Terdeteksi
+                📚
               </div>
+
+              <h2>
+                Belum Ada Data
+              </h2>
+
+
+            </div>
+
+          )}
+
+          {/* MEMBER */}
+
+          {member && (
+
+            <>
 
               <div
                 style={{
-                  display: "grid",
-                  gridTemplateColumns:
-                    "1fr 1fr",
-                  gap: 14,
-                  marginBottom: 20,
+                  marginBottom: 24,
                 }}
               >
 
-                {[
-                  {
-                    label:
-                      "Judul Buku",
-                    value:
-                      detectedBook.book_title,
-                  },
+                <h2>
+                  {member.name}
+                </h2>
 
-                  {
-                    label:
-                      "ID Buku",
-                    value:
-                      detectedBook.book_id,
-                  },
-
-                  {
-                    label:
-                      "Peminjam",
-                    value:
-                      detectedBook.borrower_name,
-                  },
-
-                  {
-                    label:
-                      "Jatuh Tempo",
-                    value:
-                      formatDate(
-                        detectedBook.due_date
-                      ),
-                  },
-
-                ].map((f) => (
-
-                  <div
-                    key={f.label}
-                    style={{
-                      background:
-                        "#fff",
-                      borderRadius: 14,
-                      padding: 14,
-                    }}
-                  >
-
-                    <div
-                      style={{
-                        fontSize: 11,
-                        color: "#666",
-                        marginBottom: 4,
-                        textTransform:
-                          "uppercase",
-                      }}
-                    >
-                      {f.label}
-                    </div>
-
-                    <div
-                      style={{
-                        fontWeight: 700,
-                      }}
-                    >
-                      {f.value}
-                    </div>
-
-                  </div>
-
-                ))}
+                <p
+                  style={{
+                    color: "#666",
+                  }}
+                >
+                  NIM:
+                  {" "}
+                  {member.nim}
+                </p>
 
               </div>
 
-              <button
-                onClick={() =>
-                  processReturn(
-                    detectedBook.book_id
-                  )
-                }
-                className="modern-btn"
-                style={{
-                  width: "100%",
-                  background:
-                    "#2f35d7",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: 16,
-                  padding:
-                    "14px 18px",
-                  fontSize: 14,
-                  fontWeight: 700,
-                  cursor: "pointer",
-                }}
-              >
-                ✔ Konfirmasi Pengembalian
-              </button>
+              {/* BOOK LIST */}
 
-            </div>
+              {loans.map(
+                (loan) => (
+
+                  <div
+                    key={loan.id}
+                    className="book-card"
+                  >
+
+                    <h3>
+                      {loan.title}
+                    </h3>
+
+                    <p
+                      style={{
+                        color:
+                          "#666",
+
+                        marginTop: 8,
+                      }}
+                    >
+                      Jatuh tempo:
+                      {" "}
+                      {formatDate(
+                        loan.due_date
+                      )}
+                    </p>
+
+                    <button
+                      onClick={() =>
+                        processReturn(
+                          loan.book_id
+                        )
+                      }
+                      className="return-btn"
+                    >
+                      ✔ Kembalikan Buku
+                    </button>
+
+                  </div>
+
+                )
+              )}
+
+            </>
 
           )}
 
         </div>
 
       </div>
+
     </>
   );
+
 }
-
-// ───────── STYLES ─────────
-
-const btnPrimaryStyle = {
-  background:
-    "linear-gradient(135deg,#4f46e5,#7c3aed)",
-  color: "#fff",
-  border: "none",
-  borderRadius: 14,
-  padding: "13px 22px",
-  fontSize: 14,
-  fontWeight: 700,
-  cursor: "pointer",
-};
-
-const btnOutlineStyle = {
-  background: "#f4f4f5",
-  color: "#111",
-  border:
-    "1px solid rgba(0,0,0,.1)",
-  borderRadius: 14,
-  padding: "13px 22px",
-  fontSize: 14,
-  fontWeight: 600,
-  cursor: "pointer",
-};
