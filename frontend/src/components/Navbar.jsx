@@ -82,7 +82,7 @@ const TABS = [
 
   {
     id: "books",
-    label: "Tambah Buku",
+    label: "Tambah Koleksi Buku",
     icon: addbooks,
     path: "/books",
     roles: ["admin"],
@@ -222,6 +222,9 @@ export default function Navbar({
                   fontSize: 18,
 
                   marginLeft: 45,
+
+                  marginTop: 30,
+                  marginBottom: 15,
                 }}
               >
                 PBJT Perpus

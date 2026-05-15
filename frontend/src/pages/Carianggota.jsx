@@ -288,16 +288,9 @@ export default function Carianggota({
 
         }
 
-        .member-card {
-
-          transition: .25s ease;
-
-        }
-
         .member-card:hover {
 
-          transform:
-            translateY(-4px);
+
 
           box-shadow:
             0 16px 30px
@@ -401,7 +394,6 @@ export default function Carianggota({
         <div
           className="glass-card"
           style={{
-            borderRadius: 28,
             padding: 28,
             marginBottom: 30,
           }}

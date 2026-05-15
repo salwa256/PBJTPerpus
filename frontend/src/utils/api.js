@@ -4,7 +4,7 @@
 // Kalau URL backend berubah, cukup ganti di sini saja.
 // ═══════════════════════════════════════════════════════
 
-const API_URL = "http://127.0.0.1:8000";
+const API_URL = "https://project-7ixze.vercel.app";
 
 /**
  * Fungsi utama untuk memanggil API.

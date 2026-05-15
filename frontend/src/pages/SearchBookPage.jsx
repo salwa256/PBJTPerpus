@@ -21,11 +21,16 @@ export default function SearchBookPage({
   const [loading, setLoading] =
     useState(false);
 
+  const [searched, setSearched] =
+    useState(false);
+
   // ───────── SEARCH ─────────
 
   async function handleSearch() {
 
     if (!query.trim()) return;
+
+    setSearched(true);
 
     setLoading(true);
 
@@ -52,6 +57,7 @@ export default function SearchBookPage({
       setLoading(false);
 
     }
+
   }
 
   return (
@@ -78,6 +84,20 @@ export default function SearchBookPage({
             opacity: 1;
             transform:
               translateY(0);
+          }
+
+        }
+
+        @keyframes spin {
+
+          from {
+            transform:
+              rotate(0deg);
+          }
+
+          to {
+            transform:
+              rotate(360deg);
           }
 
         }
@@ -139,8 +159,6 @@ export default function SearchBookPage({
         }
 
         .book-card:hover {
-
-          
 
           box-shadow:
             0 16px 30px
@@ -210,22 +228,11 @@ export default function SearchBookPage({
 
       <div className="search-page">
 
-        {/* HEADER */}
-
-        <div
-          style={{
-            marginBottom: 28,
-          }}
-        >
-
-        </div>
-
         {/* SEARCH BOX */}
 
         <div
           className="glass-card"
           style={{
-            borderRadius: 28,
             padding: 28,
             marginBottom: 30,
           }}
@@ -305,7 +312,46 @@ search-btn
               marginBottom: 20,
             }}
           >
-            Mencari buku...
+
+            <div
+              style={{
+                display: "flex",
+
+                flexDirection:
+                  "column",
+
+                alignItems:
+                  "center",
+
+                gap: 14,
+              }}
+            >
+
+              <div
+                style={{
+                  width: 42,
+
+                  height: 42,
+
+                  border:
+                    "4px solid #e5e7eb",
+
+                  borderTop:
+                    "4px solid #4f46e5",
+
+                  borderRadius: "50%",
+
+                  animation:
+                    "spin .8s linear infinite",
+                }}
+              />
+
+              <div>
+                Mencari buku...
+              </div>
+
+            </div>
+
           </div>
 
         )}
@@ -313,7 +359,7 @@ search-btn
         {/* EMPTY */}
 
         {!loading &&
-          query &&
+          searched &&
           results.length === 0 && (
 
           <div
@@ -352,92 +398,70 @@ book-card glass-card
               }}
             >
 
-              {/* GLOW */}
+              {/* COVER */}
 
               <div
                 style={{
-                  position:
-                    "absolute",
+                  width: "100%",
 
-                  right: -25,
+                  height: 280,
 
-                  top: -25,
+                  borderRadius: 18,
 
-                  width: 90,
+                  overflow: "hidden",
 
-                  height: 90,
+                  marginBottom: 18,
 
-                  borderRadius:
-                    "50%",
+                  background: "#f3f4f6",
 
-                  background:
-                    "rgba(79,70,229,.08)",
+                  display: "flex",
+
+                  alignItems: "center",
+
+                  justifyContent: "center",
+
+                  color: "#9ca3af",
+
+                  fontWeight: 700,
+
+                  fontSize: 14,
                 }}
-              />
+              >
 
-              {/* COVER */}
+                {b.image_url ? (
 
-<div
-  style={{
-    width: "100%",
+                  <img
+                    src={`http://127.0.0.1:8000${b.image_url}`}
 
-    height: 280,
+                    alt={b.title}
 
-    borderRadius: 18,
+                    style={{
+                      width: "100%",
 
-    overflow: "hidden",
+                      height: "100%",
 
-    marginBottom: 18,
+                      objectFit: "cover",
+                    }}
 
-    background: "#f3f4f6",
+                    onError={(e) => {
 
-    display: "flex",
+                      e.target.style.display =
+                        "none";
 
-    alignItems: "center",
+                      e.target.parentNode.innerHTML =
+                        "GAMBAR TIDAK TERSEDIA";
 
-    justifyContent: "center",
+                    }}
+                  />
 
-    color: "#9ca3af",
+                ) : (
 
-    fontWeight: 700,
+                  "GAMBAR TIDAK TERSEDIA"
 
-    fontSize: 14,
-  }}
->
+                )}
 
-  {b.image_url ? (
+              </div>
 
-    <img
-      src={`http://127.0.0.1:8000${b.image_url}`}
-
-      alt={b.title}
-
-      style={{
-        width: "100%",
-
-        height: "100%",
-
-        objectFit: "cover",
-      }}
-
-      onError={(e) => {
-
-        e.target.style.display =
-          "none";
-
-        e.target.parentNode.innerHTML =
-          "GAMBAR TIDAK TERSEDIA";
-
-      }}
-    />
-
-  ) : (
-
-    "GAMBAR TIDAK TERSEDIA"
-
-  )}
-
-</div>
               {/* TITLE */}
 
               <div
@@ -490,8 +514,6 @@ book-card glass-card
               >
                 {b.category}
               </div>
-
-              <div style={{ flex: 1 }} />
 
               {/* FOOTER */}
 
