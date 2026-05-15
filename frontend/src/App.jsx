@@ -162,28 +162,48 @@ export default function App() {
           {/* ───────── CONTENT ───────── */}
 
           <div
-            style={{
-              marginLeft:
-                sidebarOpen
-                  ? 220
-                  : 70,
+style={{
 
-              transition:
-                "margin-left 0.3s ease",
+marginLeft:
 
-              minHeight: "100vh",
+window.innerWidth<=768
 
-              padding: 24,
+?0
 
-              width:
-                `calc(100% - ${
-                  sidebarOpen
-                    ? 220
-                    : 70
-                }px)`,
-            }}
-          >
+:(sidebarOpen
+?220
+:70),
 
+transition:
+"margin-left .3s ease",
+
+minHeight:"100vh",
+
+padding:
+
+window.innerWidth<=768
+?12
+:24,
+
+width:
+
+window.innerWidth<=768
+
+?"100%"
+
+:`calc(100% - ${
+sidebarOpen
+?220
+:70
+}px)`,
+
+boxSizing:
+"border-box",
+
+overflowX:"hidden"
+
+}}
+>
             <Routes>
 
               {/* HOME */}

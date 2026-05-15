@@ -1,8 +1,5 @@
-// ═══════════════════════════════════════════════════════
-// components/Navbar.jsx
-// ═══════════════════════════════════════════════════════
-
-import { Link, useLocation } from "react-router-dom";
+import React,{useEffect,useState} from "react";
+import { Link,useLocation } from "react-router-dom";
 
 import home from "../assets/home.png";
 import borrow from "../assets/borrow.png";
@@ -14,562 +11,557 @@ import out from "../assets/keluar.png";
 import anggota from "../assets/anggota.png";
 import chatbot from "../assets/chatbot.png";
 
-const TABS = [
+const TABS=[
 
-  {
-    id: "home",
-    label: "Beranda",
-    icon: home,
-    path: "/",
-    roles: ["admin"],
-  },
+{
+id:"home",
+label:"Beranda",
+icon:home,
+path:"/",
+roles:["admin"]
+},
 
-  {
-    id: "carianggota",
-    label: "Cari Anggota",
-    icon: search,
-    path: "/carianggota",
-    roles: ["admin", "petugas"],
-  },
+{
+id:"carianggota",
+label:"Cari Anggota",
+icon:search,
+path:"/carianggota",
+roles:["admin","petugas"]
+},
 
-  {
-    id: "borrow",
-    label: "Peminjaman",
-    icon: borrow,
-    path: "/borrow",
-    roles: ["admin", "petugas"],
-  },
+{
+id:"borrow",
+label:"Peminjaman",
+icon:borrow,
+path:"/borrow",
+roles:["admin","petugas"]
+},
 
-  {
-    id: "return",
-    label: "Pengembalian",
-    icon: returnIcon,
-    path: "/return",
-    roles: ["admin", "petugas"],
-  },
+{
+id:"return",
+label:"Pengembalian",
+icon:returnIcon,
+path:"/return",
+roles:["admin","petugas"]
+},
 
-  {
-    id: "search",
-    label: "Cari Buku",
-    icon: search,
-    path: "/search",
-    roles: ["admin", "petugas"],
-  },
+{
+id:"search",
+label:"Cari Buku",
+icon:search,
+path:"/search",
+roles:["admin","petugas"]
+},
 
-  {
-    id: "rekomendasi",
-    label: "Rekomendasi Buku",
-    icon: rekomen,
-    path: "/rekomendasi",
-    roles: ["admin", "petugas"],
-  },
+{
+id:"rekomendasi",
+label:"Rekomendasi Buku",
+icon:rekomen,
+path:"/rekomendasi",
+roles:["admin","petugas"]
+},
 
-  {
-    id: "chatbot",
-    label: "Asisten Perpus",
-    icon: chatbot,
-    path: "/chatbot",
-    roles: ["admin", "petugas"],
-  },
+{
+id:"chatbot",
+label:"Asisten Perpus",
+icon:chatbot,
+path:"/chatbot",
+roles:["admin","petugas"]
+},
 
-  {
-    id: "members",
-    label: "Tambah Anggota",
-    icon: anggota,
-    path: "/members",
-    roles: ["admin"],
-  },
+{
+id:"members",
+label:"Tambah Anggota",
+icon:anggota,
+path:"/members",
+roles:["admin"]
+},
 
-  {
-    id: "books",
-    label: "Tambah Koleksi Buku",
-    icon: addbooks,
-    path: "/books",
-    roles: ["admin"],
-  },
+{
+id:"books",
+label:"Tambah Koleksi Buku",
+icon:addbooks,
+path:"/books",
+roles:["admin"]
+}
 
 ];
 
 export default function Navbar({
-  username,
-  role,
-  onLogout,
-  sidebarOpen,
-  setSidebarOpen,
-}) {
 
-  const location =
-    useLocation();
+username,
+role,
+onLogout,
+sidebarOpen,
+setSidebarOpen
 
-  const sidebarStyle = `
+}){
 
- 
-  `;
+const location=useLocation();
 
-  return (
-    <>
+const [isMobile,setIsMobile]=
+useState(
+window.innerWidth<=768
+);
 
-      <style>{sidebarStyle}</style>
+useEffect(()=>{
 
-      {/* TOGGLE */}
+const handleResize=()=>{
 
-      <button
-        onClick={() =>
-          setSidebarOpen(
-            !sidebarOpen
-          )
-        }
-        style={{
-          position: "fixed",
+const mobile=
+window.innerWidth<=768;
 
-          top: 16,
+setIsMobile(mobile);
 
-          left:
-            sidebarOpen
-              ? 220
-              : 70,
+if(mobile){
 
-          zIndex: 300,
+setSidebarOpen(false);
 
-          background:
-            "#4f46e5",
+}
 
-          color: "#fff",
+};
 
-          border: "none",
+window.addEventListener(
+"resize",
+handleResize
+);
 
-          borderRadius: 10,
+return()=>{
 
-          width: 36,
+window.removeEventListener(
+"resize",
+handleResize
+);
 
-          height: 36,
+};
 
-          cursor: "pointer",
+},[setSidebarOpen]);
 
-          transition:
-  "all .4s cubic-bezier(.175,.885,.32,1.1)",
 
-          boxShadow:
-            "0 8px 18px rgba(79,70,229,0.3)",
-        }}
-      >
+const sidebarStyle=`
 
-        {sidebarOpen
-          ? "←"
-          : "→"}
+::-webkit-scrollbar{
 
-      </button>
+width:6px;
 
-      {/* SIDEBAR */}
+}
 
-      <div
-        style={{
-          position: "fixed",
+::-webkit-scrollbar-thumb{
 
-          top: 0,
+background:#ddd;
 
-          left: 0,
+border-radius:20px;
 
-          width:
-            sidebarOpen
-              ? 220
-              : 70,
+}
 
-          height: "100vh",
+`;
 
-          background: "#fff",
+return(
 
-          borderRight:
-            "1px solid rgba(0,0,0,0.08)",
+<>
 
-          padding: 16,
+<style>
+{sidebarStyle}
+</style>
 
-          transition:
-            "all 0.3s ease",
 
-          zIndex: 200,
+<button
 
-          overflow: "visible",
+onClick={()=>
+setSidebarOpen(
+!sidebarOpen
+)
+}
 
-          boxShadow:
-            "0 0 30px rgba(0,0,0,0.03)",
-        }}
-      >
+style={{
 
-        {/* HEADER */}
+position:"fixed",
 
-        <div
-          style={{
-            marginBottom: 24,
+top:16,
 
-            display: "flex",
+left:
+sidebarOpen
+?(isMobile?16:220)
+:16,
 
-            alignItems: "center",
+zIndex:999,
 
-            gap: 10,
+background:"#4f46e5",
 
-            minHeight: 40,
-          }}
-        >
+color:"#fff",
 
-          {sidebarOpen && (
+border:"none",
 
-            <div>
+borderRadius:10,
 
-              <div
-                style={{
+width:38,
 
-                  fontSize: 18,
+height:38,
 
-                  marginLeft: 45,
+cursor:"pointer",
 
-                  marginTop: 30,
-                  marginBottom: 15,
-                }}
-              >
-                PBJT Perpus
-              </div>
+boxShadow:
+"0 8px 18px rgba(79,70,229,.3)",
 
-            </div>
+transition:
+".3s"
 
-          )}
+}}
 
-        </div>
+>
 
-        {/* MENU */}
+{sidebarOpen
+?"←"
+:"→"}
 
-        <div
-          style={{
-            display: "flex",
+</button>
 
-            flexDirection:
-              "column",
 
-            gap: 4,
+<div
 
-            fontSize: 12,
-          }}
-        >
+style={{
 
-          {TABS
-            .filter((tab) =>
-              tab.roles.includes(
-                role
-              )
-            )
-            .map((tab) => {
+position:"fixed",
 
-              const active =
-                location.pathname ===
-                tab.path;
+top:0,
 
-              return (
+left:0,
 
-                <Link
-                  key={tab.id}
+width:
 
-                  to={tab.path}
+isMobile
 
-                  className={
-                    active
-                      ? "sidebar-active"
-                      : ""
-                  }
+?(sidebarOpen?220:0)
 
-                  style={{
-                    display: "flex",
+:(sidebarOpen?220:70),
 
-                    alignItems:
-                      "center",
+height:"100vh",
 
-                    justifyContent:
-                      sidebarOpen
-                        ? "flex-start"
-                        : "center",
+background:"#fff",
 
-                    gap:
-                      sidebarOpen
-                        ? 12
-                        : 0,
+borderRight:
+"1px solid rgba(0,0,0,.08)",
 
-                    padding: "12px",
+padding:16,
 
-                    textDecoration:
-                      "none",
+zIndex:200,
 
-                    transition:
-                      ".25s ease",
+display:"flex",
 
-                    background:
-                      active
-                        ? "#dcdbec"
-                        : "transparent",
+flexDirection:"column",
 
-                    marginRight:
-                      active
-                        ? "-16px"
-                        : "0",
+overflow:"hidden",
 
-                    paddingRight:
-                      active
-                        ? "14px"
-                        : "16px",
+transition:
+".3s",
 
-                    borderRadius:
-                      active
-                        ? "20px 0 0 20px"
-                        : "18px",
+transform:
 
-                    color:
-                      active
-                        ? "#170ebb"
-                        : "#333",
+isMobile&&!sidebarOpen
 
-                    fontWeight:
-                      active
-                        ? 700
-                        : 500,
+?"translateX(-100%)"
 
-                    whiteSpace:
-                      sidebarOpen
-                        ? "normal"
-                        : "nowrap",
+:"translateX(0)",
 
-                    wordWrap:
-                      "break-word",
+opacity:
 
-                    overflow:
-                      "visible",
+isMobile&&!sidebarOpen
 
-                    minHeight: 24,
+?0
 
-                    position:
-                      "relative",
+:1,
 
-                    zIndex:
-                      active
-                        ? 2
-                        : 1,
+boxShadow:
+"0 0 30px rgba(0,0,0,.03)"
 
-                    boxShadow:
-                      active
-                        ? "0 10px 25px rgba(0,0,0,.08)"
-                        : "none",
-                  }}
-                >
+}}
 
-                  {/* ICON */}
+>
 
-                  <span
-                    style={{
-                      fontSize: 8,
 
-                      minWidth: 24,
+<div
+style={{
 
-                      textAlign:
-                        "center",
+marginBottom:24,
 
-                      flexShrink: 0,
-                    }}
-                  >
+minHeight:40
 
-                    <img
-                      src={tab.icon}
+}}
+>
 
-                      alt={tab.label}
+{sidebarOpen&&(
 
-                      style={{
-                        width: 20,
+<div
+style={{
 
-                        height: 20,
+fontSize:18,
 
-                        objectFit:
-                          "contain",
-                      }}
-                    />
+marginLeft:45,
 
-                  </span>
+marginTop:30
 
-                  {/* TEXT */}
+}}
+>
 
-                  {sidebarOpen && (
+PBJT Perpus
 
-                    <span
-                      style={{
-                        flex: 1,
+</div>
 
-                        lineHeight:
-                          1.3,
-                      }}
-                    >
-                      {tab.label}
-                    </span>
+)}
 
-                  )}
+</div>
 
-                </Link>
 
-              );
+<div
 
-            })}
+style={{
 
-        </div>
+display:"flex",
 
-        {/* USER */}
+flexDirection:"column",
 
-        <div
-          style={{
-            position: "absolute",
+gap:4,
 
-            bottom: 20,
+fontSize:12,
 
-            left: 16,
+flex:1,
 
-            right: 16,
-          }}
-        >
+overflowY:"auto",
 
-          {/* USER INFO */}
+paddingBottom:20
 
-          <div
-            style={{
-              display: "flex",
+}}
 
-              alignItems:
-                "center",
+>
 
-              gap: 10,
+{TABS
+.filter(tab=>
+tab.roles.includes(role)
+)
 
-              marginBottom: 12,
-            }}
-          >
+.map(tab=>{
 
-            {/* AVATAR */}
+const active=
+location.pathname===
+tab.path;
 
-            <div
-              style={{
-                width: 38,
+return(
 
-                height: 38,
+<Link
 
-                borderRadius:
-                  "50%",
+key={tab.id}
 
-                background:
-                  "linear-gradient(135deg,#4f46e5,#7c3aed)",
+to={tab.path}
 
-                color: "#fff",
+style={{
 
-                display: "flex",
+display:"flex",
 
-                alignItems:
-                  "center",
+alignItems:"center",
 
-                justifyContent:
-                  "center",
+justifyContent:
+sidebarOpen
+?"flex-start"
+:"center",
 
-                fontWeight: 700,
+gap:
+sidebarOpen
+?12
+:0,
 
-                flexShrink: 0,
-              }}
-            >
+padding:"12px",
 
-              {username
-                ?.substring(0, 2)
-                .toUpperCase()}
+textDecoration:
+"none",
 
-            </div>
+background:
+active
+?"#dcdbec"
+:"transparent",
 
-            {/* USERNAME */}
+borderRadius:
+active
+?"20px 0 0 20px"
+:"18px",
 
-            {sidebarOpen && (
+color:
+active
+?"#170ebb"
+:"#333",
 
-              <div>
+fontWeight:
+active
+?700
+:500,
 
-                <div
-                  style={{
+marginRight:0
 
-                    fontSize: 13,
-                  }}
-                >
-                  {username}
-                </div>
+}}
 
-                <div
-                  style={{
-                    fontSize: 11,
+>
 
-                    color: "#777",
+<img
 
-                    textTransform:
-                      "capitalize",
-                  }}
-                >
-                  {role}
-                </div>
+src={tab.icon}
 
-              </div>
+alt=""
 
-            )}
+style={{
 
-          </div>
+width:20,
+height:20
 
-          {/* LOGOUT */}
+}}
+/>
 
-          <button
-            onClick={onLogout}
-            style={{
-              width: "100%",
+{sidebarOpen&&(
 
-              border: "none",
+<span>
 
-              background:
-                "linear-gradient(135deg,#ef4444,#dc2626)",
+{tab.label}
 
-              color: "#fff",
+</span>
 
-              padding:
-                "10px 12px",
+)}
 
-              borderRadius: 10,
+</Link>
 
-              cursor: "pointer",
+)
 
-              fontWeight: 600,
+})}
 
-              transition:
-                "0.2s",
-            }}
-          >
+</div>
 
-            {sidebarOpen
-              ? "Keluar"
-              : (
 
-                <img
-                  src={out}
+<div
 
-                  alt="Logout"
+style={{
 
-                  style={{
-                    width: 18,
+marginTop:"auto",
 
-                    height: 18,
+paddingTop:12,
 
-                    objectFit:
-                      "contain",
-                  }}
-                />
+borderTop:
+"1px solid rgba(0,0,0,.08)"
 
-              )}
+}}
 
-          </button>
+>
 
-        </div>
+<div
 
-      </div>
+style={{
 
-    </>
-  );
+display:"flex",
+
+alignItems:"center",
+
+gap:10,
+
+marginBottom:12
+
+}}
+
+>
+
+<div
+
+style={{
+
+width:38,
+height:38,
+
+borderRadius:"50%",
+
+background:
+"linear-gradient(135deg,#4f46e5,#7c3aed)",
+
+display:"flex",
+
+justifyContent:"center",
+
+alignItems:"center",
+
+color:"#fff"
+
+}}
+
+>
+
+{username
+?.substring(0,2)
+.toUpperCase()}
+
+</div>
+
+{sidebarOpen&&(
+
+<div>
+
+<div>
+{username}
+</div>
+
+<div
+style={{
+fontSize:11,
+color:"#777"
+}}
+>
+
+{role}
+
+</div>
+
+</div>
+
+)}
+
+</div>
+
+<button
+
+onClick={onLogout}
+
+style={{
+
+width:"100%",
+
+border:"none",
+
+background:
+"linear-gradient(135deg,#ef4444,#dc2626)",
+
+padding:"10px",
+
+color:"#fff",
+
+borderRadius:10
+
+}}
+
+>
+
+{sidebarOpen
+?"Keluar"
+:
+<img
+src={out}
+alt=""
+style={{
+width:18
+}}
+/>
+}
+
+</button>
+
+</div>
+
+</div>
+
+</>
+
+)
 
 }

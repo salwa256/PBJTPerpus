@@ -413,52 +413,61 @@ def add_book(book: BookModel):
 # =========================
 # DELETE BOOK
 # =========================
-
-@app.delete("/books/{book_id}")
+@app.delete("/books/{book_id:path}")
 def delete_book(book_id: str):
 
     db = get_db()
-
     cur = db.cursor()
 
-    cur.execute(
-        "SELECT status FROM books WHERE id=%s",
-        (book_id,)
-    )
+    try:
 
-    book = cur.fetchone()
+        cur.execute("""
+    SELECT *
+    FROM books
+    WHERE TRIM(id)=TRIM(%s)
+""",(book_id,))
 
-    if not book:
+        book = cur.fetchone()
 
+        if not book:
+            raise HTTPException(
+                status_code=404,
+                detail="Buku tidak ditemukan"
+            )
+
+        cur.execute("""
+            SELECT *
+            FROM loans
+            WHERE book_id=%s
+            AND status IN(
+                'dipinjam',
+                'terlambat'
+            )
+        """,(book_id,))
+
+        activeLoan = cur.fetchone()
+
+        if activeLoan:
+            raise HTTPException(
+                status_code=400,
+                detail="Buku masih dipinjam"
+            )
+
+        cur.execute("""
+    DELETE
+    FROM books
+    WHERE TRIM(id)=TRIM(%s)
+""",(book_id,))
+
+        db.commit()
+
+        return {
+            "message":"Buku berhasil dihapus"
+        }
+
+    finally:
         db.close()
-
-        raise HTTPException(
-            status_code=404,
-            detail="Buku tidak ditemukan"
-        )
-
-    if book["status"] == "dipinjam":
-
-        db.close()
-
-        raise HTTPException(
-            status_code=400,
-            detail="Tidak bisa hapus buku yang sedang dipinjam"
-        )
-
-    cur.execute(
-        "DELETE FROM books WHERE id=%s",
-        (book_id,)
-    )
-
-    db.commit()
-
-    db.close()
-
-    return {
-        "message": "Buku berhasil dihapus"
-    }
-
+        
 # =========================
 # LOANS
 # =========================
@@ -471,15 +480,15 @@ def get_loans():
     cur = db.cursor()
 
     cur.execute("""
-        SELECT
-            l.*,
-            b.title as book_title,
-            b.author as book_author
-        FROM loans l
-        JOIN books b
-        ON l.book_id = b.id
-        ORDER BY l.borrow_date DESC
-    """)
+SELECT
+    l.*,
+    b.title as book_title,
+    b.author as book_author
+FROM loans l
+LEFT JOIN books b
+ON l.book_id = b.id
+ORDER BY l.borrow_date DESC
+""")
 
     loans = cur.fetchall()
 
@@ -508,8 +517,8 @@ def get_active_loans():
             b.title as book_title,
             b.author as book_author
         FROM loans l
-        JOIN books b
-        ON l.book_id = b.id
+LEFT JOIN books b
+ON l.book_id = b.id
         WHERE l.status IN ('dipinjam','terlambat')
         ORDER BY l.due_date ASC
     """)
@@ -692,8 +701,8 @@ def get_member_loans(nim: str):
             b.title as book_title,
             b.author as book_author
         FROM loans l
-        JOIN books b
-        ON l.book_id = b.id
+LEFT JOIN books b
+ON l.book_id = b.id
         WHERE l.nim = %s
         AND l.status IN ('dipinjam', 'terlambat')
         ORDER BY l.borrow_date DESC
@@ -843,8 +852,8 @@ def return_book(data: ReturnModel):
             l.*,
             b.title as book_title
         FROM loans l
-        JOIN books b
-        ON l.book_id = b.id
+LEFT JOIN books b
+ON l.book_id = b.id
         WHERE l.book_id = %s
         AND l.status IN ('dipinjam', 'terlambat')
         ORDER BY l.borrow_date DESC

@@ -181,10 +181,10 @@ export default function BooksPage({
 
     try {
 
-      const r = await apiFetch(
-        "/books/" + id,
+      await apiFetch(
+        `/books/${encodeURIComponent(id)}`,
         "DELETE"
-      );
+        )
 
       showToast(
         r.message,

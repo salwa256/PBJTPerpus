@@ -11,7 +11,7 @@ function Rekomendasi() {
   const [loading, setLoading] = useState(false);
 
   // API LOCAL
-  const API = "http://localhost:8000";
+  const API = "https://project-7ixze.vercel.app";
 
   // STYLE
   const styles = `
@@ -70,62 +70,206 @@ function Rekomendasi() {
       transform: scale(1.03);
     }
 
-    .book-list {
-      margin-top: 80px;
-      padding: 0;
-    }
+    .book-list{
+  margin-top:80px;
+  padding:0;
 
-    .empty-state {
-      font-size: 20px;
-      line-height: 1.8;
-      color: #222;
-    }
+  display:grid;
 
-    .book-card {
-      list-style: none;
-      background: white;
-      border-radius: 20px;
-      padding: 20px;
-      margin-bottom: 20px;
-      display: flex;
-      gap: 20px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    }
+  grid-template-columns:
+  repeat(
+    auto-fill,
+    minmax(290px,1fr)
+  );
 
-    .book-cover {
-      width: 120px;
-      border-radius: 12px;
-    }
+  gap:28px;
+}
 
-    .book-info h3 {
-      margin-bottom: 10px;
-    }
 
-    .loading {
-      font-size: 18px;
-      color: #333;
-    }
+.book-card{
+  list-style:none;
 
-    .add-book-wrapper {
-      position: fixed;
-      bottom: 30px;
-      right: 30px;
-    }
+  background:white;
 
-    .add-book-btn {
-      width: 60px;
-      height: 60px;
-      border: none;
-      border-radius: 50%;
-      background: #2f35d7;
-      color: white;
-      font-size: 28px;
-      cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    }
+  border-radius:30px;
 
-    /* ANIMATION */
+  overflow:hidden;
 
+  padding:18px;
+
+  min-height:520px;
+
+  display:flex;
+
+  flex-direction:column;
+
+  box-shadow:
+  0 10px 25px rgba(
+  0,0,0,.05);
+
+  opacity:1;
+
+  transition:.35s;
+}
+
+
+.book-card:hover{
+
+transform:translateY(-8px);
+
+box-shadow:
+0 18px 40px rgba(
+0,0,0,.1);
+
+}
+
+
+.book-image{
+
+width:100%;
+
+height:280px;
+
+background:#f4f5f7;
+
+border-radius:22px;
+
+overflow:hidden;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+margin-bottom:20px;
+
+}
+
+
+.book-cover{
+
+width:100%;
+
+height:100%;
+
+object-fit:cover;
+
+}
+
+
+.empty-cover{
+
+font-size:20px;
+
+font-weight:700;
+
+color:#9ca3af;
+
+text-align:center;
+
+padding:20px;
+
+}
+
+
+.book-info{
+
+display:flex;
+
+flex-direction:column;
+
+flex:1;
+
+}
+
+
+.book-title{
+
+font-size:18px;
+
+font-weight:800;
+
+line-height:1.5;
+
+text-transform:uppercase;
+
+margin-bottom:14px;
+
+color:#222;
+
+}
+
+
+.author{
+
+color:#757575;
+
+margin-bottom:20px;
+
+font-size:15px;
+
+}
+
+
+.badge{
+
+width:fit-content;
+
+padding:8px 14px;
+
+border-radius:999px;
+
+background:#eef0ff;
+
+color:#4c54eb;
+
+font-size:12px;
+
+font-weight:700;
+
+margin-bottom:auto;
+
+}
+
+
+.bottom-row{
+
+margin-top:24px;
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+}
+
+
+.book-id{
+
+color:#9a9a9a;
+
+font-size:14px;
+
+}
+
+
+.status{
+
+padding:7px 14px;
+
+background:#dcfce7;
+
+color:#16a34a;
+
+border-radius:999px;
+
+font-size:12px;
+
+font-weight:bold;
+
+}
 @keyframes fadeIn {
   from {
     opacity: 0;
@@ -429,49 +573,86 @@ p {
 
               ) : books.length > 0 ? (
 
-                books.map((book, index) => (
+                books.map((book,index)=>(
 
-                  <li
-                    key={index}
-                    className="book-card"
-                    styles={{
-                      animationDelay: `${index * 0.15}s`
-                    }}
-                  >
+<li
+key={index}
+className="book-card"
+style={{
+animationDelay:`${index*0.15}s`
+}}
+>
 
-                    <div className="book-image">
+<div className="book-image">
 
-                      <img
-                        className="book-cover"
-                        src={`${API}${book.image_url}`}
-                        alt={book.judul}
-                        onError={(e) => {
-                          e.target.src =
-                            `${API}/images/no_cover.png`;
-                        }}
-                      />
+<img
+className="book-cover"
+src={`${API}${book.image_url}`}
+alt={book.judul}
 
-                    </div>
+onError={(e)=>{
 
-                    <div className="book-info">
+e.target.style.display="none"
 
-                      <h3>{book.judul}</h3>
+e.target.nextSibling.style.display="flex"
 
-                      <p>
-                        <b>Pengarang:</b>{" "}
-                        {book.pengarang}
-                      </p>
+}}
+/>
 
-                      <p>
-                        <b>Kategori:</b>{" "}
-                        {book.klasifikasi}
-                      </p>
+<div
+className="empty-cover"
+style={{
+display:"none"
+}}
+>
 
-                    </div>
+GAMBAR TIDAK TERSEDIA
 
-                  </li>
+</div>
 
-                ))
+</div>
+
+<div className="book-info">
+
+<div className="book-title">
+
+{book.judul}
+
+</div>
+
+<div className="author">
+
+Penulis: {book.pengarang}
+
+</div>
+
+<div className="badge">
+
+{book.klasifikasi||"Ilmiah"}
+
+</div>
+
+<div className="bottom-row">
+
+<div className="book-id">
+
+{book.id||"-"}
+
+</div>
+
+<div className="status">
+
+tersedia
+
+</div>
+
+</div>
+
+</div>
+
+</li>
+
+))
 
               ) : (
 
