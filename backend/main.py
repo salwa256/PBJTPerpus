@@ -917,9 +917,9 @@ def delete_member(member_id: str):
             SELECT *
             FROM members
             WHERE
-            TRIM(member_code)=TRIM(%s)
+            TRIM(CAST(id AS TEXT))=TRIM(%s)
+            OR TRIM(member_code)=TRIM(%s)
             OR TRIM(nim)=TRIM(%s)
-            OR TRIM(CAST(id AS TEXT))=TRIM(%s)
         """,(
             member_id,
             member_id,
@@ -929,26 +929,25 @@ def delete_member(member_id: str):
         member = cur.fetchone()
 
         if not member:
-
             raise HTTPException(
                 status_code=404,
                 detail="Member tidak ditemukan"
             )
 
+        # cek pinjaman pakai ID asli member
         cur.execute("""
             SELECT *
             FROM loans
-            WHERE member_id=%s
+            WHERE CAST(member_id AS TEXT)=%s
             AND status IN(
                 'dipinjam',
                 'terlambat'
             )
-        """,(member["member_code"],))
+        """,(str(member["id"]),))
 
-        activeLoan=cur.fetchone()
+        activeLoan = cur.fetchone()
 
         if activeLoan:
-
             raise HTTPException(
                 status_code=400,
                 detail="Member masih memiliki pinjaman aktif"
@@ -962,9 +961,8 @@ def delete_member(member_id: str):
 
         db.commit()
 
-        return{
-            "message":
-            "Member berhasil dihapus"
+        return {
+            "message":"Member berhasil dihapus"
         }
 
     except HTTPException:
@@ -974,7 +972,7 @@ def delete_member(member_id: str):
 
         db.rollback()
 
-        print("DELETE MEMBER ERROR:")
+        print("DELETE MEMBER ERROR")
         print(e)
 
         raise HTTPException(
@@ -983,9 +981,8 @@ def delete_member(member_id: str):
         )
 
     finally:
-
-        db.close()
-        # =========================
+        db.close()        
+# =========================
 # EDIT MEMBER
 # =========================
 
