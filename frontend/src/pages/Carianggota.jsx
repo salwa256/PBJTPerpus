@@ -141,11 +141,17 @@ export default function Carianggota({
 
     try {
 
-      await apiFetch(
-        `/members/${editingMemberId}`,
-        "PUT",
-        form
-      );
+      const r = await apiFetch(
+  isEditing
+    ? `/members/${encodeURIComponent(editingMemberId)}`
+    : "/members",
+
+  isEditing
+    ? "PUT"
+    : "POST",
+
+  form
+);
 
       showToast(
         "Data anggota berhasil diperbarui",

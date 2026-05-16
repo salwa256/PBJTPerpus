@@ -62,12 +62,16 @@ export default function MembersPage({
     try {
 
       const r = await apiFetch(
-        isEditing
-          ? `/members/${editingMemberId}`
-          : "/members",
-        isEditing ? "PUT" : "POST",
-        form
-      );
+  isEditing
+    ? `/members/${encodeURIComponent(editingMemberId)}`
+    : "/members",
+
+  isEditing
+    ? "PUT"
+    : "POST",
+
+  form
+);
 
       showToast(r.message, "ok");
 

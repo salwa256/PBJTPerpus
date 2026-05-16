@@ -975,6 +975,75 @@ def delete_member(member_id: str):
     finally:
 
         db.close()
+
+        # =========================
+# EDIT MEMBER
+# =========================
+
+@app.put("/members/{member_id:path}")
+def update_member(
+    member_id:str,
+    member: MemberModel
+):
+
+    db = get_db()
+    cur = db.cursor()
+
+    try:
+
+        cur.execute("""
+            SELECT *
+            FROM members
+            WHERE id=%s
+        """,(member_id,))
+
+        old = cur.fetchone()
+
+        if not old:
+
+            raise HTTPException(
+                status_code=404,
+                detail="Member tidak ditemukan"
+            )
+
+        cur.execute("""
+            UPDATE members
+            SET
+                member_code=%s,
+                name=%s,
+                nim=%s,
+                major=%s,
+                phone=%s,
+                address=%s
+            WHERE id=%s
+        """,(
+            member.member_code,
+            member.name,
+            member.nim,
+            member.major,
+            member.phone,
+            member.address,
+            member_id
+        ))
+
+        db.commit()
+
+        return {
+            "message":"Member berhasil diupdate"
+        }
+
+    except Exception as e:
+
+        db.rollback()
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
+
+    finally:
+
+        db.close()
 # =========================
 # RUN SERVER
 # =========================
