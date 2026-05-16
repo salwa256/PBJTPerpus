@@ -4,7 +4,7 @@
 // Kalau URL backend berubah, cukup ganti di sini saja.
 // ═══════════════════════════════════════════════════════
 
-const API_URL = "https://project-7ixze.vercel.app";
+const API_URL = "https://backend-ashen-gamma-46.vercel.app";
 
 /**
  * Fungsi utama untuk memanggil API.
