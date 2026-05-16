@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import {
   BrowserRouter,
@@ -14,6 +14,7 @@ import { useLoader } from "./hooks/useLoader";
 import Toast from "./components/Toast";
 import LoaderOverlay from "./components/LoaderOverlay";
 import Navbar from "./components/Navbar";
+import SplashScreen from "./components/SplashScreen";
 
 // Pages
 import LoginPage from "./pages/LoginPage";
@@ -29,27 +30,29 @@ import ChatBotPage from "./pages/ChatBotPage";
 
 export default function App() {
 
-  // ───────── SESSION ─────────
+  // SPLASH
+  const [loading, setLoading] =
+    useState(true);
 
+  // SESSION
   const [session, setSession] =
     useState(null);
 
-  // ───────── SIDEBAR ─────────
-
+  // SIDEBAR
   const [
     sidebarOpen,
     setSidebarOpen
-  ] = useState(true);
+  ] = useState(
+    window.innerWidth > 768
+  );
 
-  // ───────── SELECTED MEMBER ─────────
-
+  // MEMBER
   const [
     selectedMember,
     setSelectedMember
   ] = useState(null);
 
-  // ───────── HOOKS ─────────
-
+  // HOOKS
   const {
     toast,
     showToast
@@ -60,17 +63,63 @@ export default function App() {
     setLoader
   } = useLoader();
 
-  // ───────── LOGIN ─────────
+  // SPLASH EFFECT
+  useEffect(() => {
 
-  function handleLogin(data) {
+    const timer =
+      setTimeout(() => {
+
+      setLoading(false);
+
+    },2500);
+
+    return () =>
+      clearTimeout(timer);
+
+  },[]);
+
+  // RESPONSIVE SIDEBAR
+  useEffect(()=>{
+
+    const handleResize=()=>{
+
+      if(
+        window.innerWidth<=768
+      ){
+
+        setSidebarOpen(false);
+
+      }else{
+
+        setSidebarOpen(true);
+
+      }
+
+    };
+
+    window.addEventListener(
+      "resize",
+      handleResize
+    );
+
+    return()=>{
+
+      window.removeEventListener(
+        "resize",
+        handleResize
+      );
+
+    };
+
+  },[]);
+
+  function handleLogin(data){
 
     setSession(data);
 
   }
 
-  // ───────── LOGOUT ─────────
-
-  function handleLogout() {
+  function handleLogout(){
 
     setSession(null);
 
@@ -81,87 +130,89 @@ export default function App() {
 
   }
 
+  // WAJIB setelah semua hook
+  if(loading){
+
+    return <SplashScreen/>
+
+  }
+
   return (
-    <>
 
-      {/* ───────── GLOBAL STYLE ───────── */}
+<>
+<style>{`
 
-      <style>{`
+@import url(
+'https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap'
+);
 
-        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+*{
+box-sizing:border-box;
+margin:0;
+padding:0;
+}
 
-        * {
-          box-sizing: border-box;
-          margin: 0;
-          padding: 0;
-        }
+body{
 
-        body {
+font-family:
+'Plus Jakarta Sans',
+sans-serif;
 
-          font-family:
-            'Plus Jakarta Sans',
-            sans-serif;
+background:#f5f4f0;
 
-          background: #f5f4f0;
+overflow-x:hidden;
 
-          color: #1a1a1a;
+}
 
-          font-size: 14px;
+a{
+text-decoration:none;
+}
 
-        }
+`}</style>
 
-        a {
-          text-decoration: none;
-        }
+<LoaderOverlay
+visible={loader.visible}
+message={loader.message}
+/>
 
-      `}</style>
+<Toast
+message={toast.message}
+type={toast.type}
+visible={toast.visible}
+/>
 
-      {/* ───────── GLOBAL COMPONENTS ───────── */}
+{!session&&(
 
-      <LoaderOverlay
-        visible={loader.visible}
-        message={loader.message}
-      />
+<LoginPage
+onLogin={handleLogin}
+showToast={showToast}
+setLoader={setLoader}
+/>
 
-      <Toast
-        message={toast.message}
-        type={toast.type}
-        visible={toast.visible}
-      />
+)}
 
-      {/* ───────── LOGIN PAGE ───────── */}
+{session&&(
 
-      {!session && (
+<BrowserRouter>
 
-        <LoginPage
-          onLogin={handleLogin}
-          showToast={showToast}
-          setLoader={setLoader}
-        />
+<Navbar
+username={
+session.username
+}
+onLogout={
+handleLogout
+}
+sidebarOpen={
+sidebarOpen
+}
+setSidebarOpen={
+setSidebarOpen
+}
+role={session.role}
+/>
 
-      )}
+<div
 
-      {/* ───────── DASHBOARD ───────── */}
-
-      {session && (
-
-        <BrowserRouter>
-
-          {/* ───────── SIDEBAR ───────── */}
-
-          <Navbar
-            username={session.username}
-            onLogout={handleLogout}
-            sidebarOpen={sidebarOpen}
-            setSidebarOpen={
-              setSidebarOpen
-            }
-            role={session.role}
-          />
-
-          {/* ───────── CONTENT ───────── */}
-
-          <div
 style={{
 
 marginLeft:
@@ -175,15 +226,16 @@ window.innerWidth<=768
 :70),
 
 transition:
-"margin-left .3s ease",
-
-minHeight:"100vh",
+".3s",
 
 padding:
 
 window.innerWidth<=768
-?12
-:24,
+?15
+:25,
+
+minHeight:
+"100vh",
 
 width:
 
@@ -191,228 +243,171 @@ window.innerWidth<=768
 
 ?"100%"
 
-:`calc(100% - ${
+:`calc(
+100% - ${
 sidebarOpen
 ?220
 :70
-}px)`,
+}px
+)`,
 
-boxSizing:
-"border-box",
-
-overflowX:"hidden"
+overflowX:
+"hidden"
 
 }}
+
 >
-            <Routes>
 
-              {/* HOME */}
+<Routes>
 
-              <Route
-                path="/"
-                element={
-                  session.role ===
-                  "admin"
-                    ? (
-                      <HomePage
-                        showToast={
-                          showToast
-                        }
-                        setLoader={
-                          setLoader
-                        }
-                      />
-                    )
-                    : (
-                      <BorrowPage
-                        session={
-                          session
-                        }
-                        showToast={
-                          showToast
-                        }
-                        setLoader={
-                          setLoader
-                        }
-                        selectedMember={
-                          selectedMember
-                        }
-                      />
-                    )
-                }
-              />
+<Route
+path="/"
+element={
 
-              {/* BORROW */}
+session.role==="admin"
 
-              <Route
-                path="/borrow"
-                element={
-                  <BorrowPage
-                    session={session}
-                    showToast={
-                      showToast
-                    }
-                    setLoader={
-                      setLoader
-                    }
-                    selectedMember={
-                      selectedMember
-                    }
-                  />
-                }
-              />
+?
 
-              {/* SEARCH */}
+<HomePage
+showToast={
+showToast
+}
+setLoader={
+setLoader
+}
+/>
 
-              <Route
-                path="/search"
-                element={
-                  <SearchBookPage
-                    showToast={
-                      showToast
-                    }
-                    onSelectBook={(
-                      book
-                    ) => {
+:
 
-                      localStorage.setItem(
-                        "selectedBook",
-                        JSON.stringify(
-                          book
-                        )
-                      );
+<BorrowPage
+session={
+session
+}
+showToast={
+showToast
+}
+setLoader={
+setLoader
+}
+selectedMember={
+selectedMember
+}
+/>
 
-                      window.location.href =
-                        "/borrow";
+}
+/>
 
-                    }}
-                  />
-                }
-              />
+<Route
+path="/borrow"
+element={
+<BorrowPage
+session={session}
+showToast={showToast}
+setLoader={setLoader}
+selectedMember={selectedMember}
+/>
+}
+/>
 
-              {/* RETURN */}
+<Route
+path="/return"
+element={
+<ReturnPage
+showToast={showToast}
+setLoader={setLoader}
+/>
+}
+/>
 
-              <Route
-                path="/return"
-                element={
-                  <ReturnPage
-                    showToast={
-                      showToast
-                    }
-                    setLoader={
-                      setLoader
-                    }
-                  />
-                }
-              />
+<Route
+path="/books"
+element={
 
-              {/* BOOKS */}
+<BooksPage
+showToast={
+showToast
+}
+setLoader={
+setLoader
+}
+/>
 
-              <Route
-                path="/books"
-                element={
-                  session.role ===
-                  "admin"
-                    ? (
-                      <BooksPage
-                        showToast={
-                          showToast
-                        }
-                        setLoader={
-                          setLoader
-                        }
-                      />
-                    )
-                    : (
-                      <div
-                        style={{
-                          background:
-                            "#fff",
+}
+/>
 
-                          padding: 30,
+<Route
+path="/search"
+element={
+<SearchBookPage
+showToast={
+showToast
+}
+/>
+}
+/>
 
-                          borderRadius: 20,
+<Route
+path="/rekomendasi"
+element={
+<RekomendasiPage
+showToast={
+showToast
+}
+setLoader={
+setLoader
+}
+/>
+}
+/>
 
-                          textAlign:
-                            "center",
+<Route
+path="/members"
+element={
+<MembersPage
+showToast={
+showToast
+}
+setLoader={
+setLoader
+}
+setSelectedMember={
+setSelectedMember
+}
+/>
+}
+/>
 
-                          fontWeight: 600,
-                        }}
-                      >
-                        Tidak punya akses
-                      </div>
-                    )
-                }
-              />
+<Route
+path="/carianggota"
+element={
+<Carianggota
+showToast={
+showToast
+}
+setLoader={
+setLoader
+}
+/>
+}
+/>
 
-              {/* REKOMENDASI */}
+<Route
+path="/chatbot"
+element={
+<ChatBotPage/>
+}
+/>
 
-              <Route
-                path="/rekomendasi"
-                element={
-                  <RekomendasiPage
-                    showToast={
-                      showToast
-                    }
-                    setLoader={
-                      setLoader
-                    }
-                  />
-                }
-              />
+</Routes>
 
-              {/* MEMBERS */}
+</div>
 
-              <Route
-                path="/members"
-                element={
-                  <MembersPage
-                    showToast={
-                      showToast
-                    }
-                    setLoader={
-                      setLoader
-                    }
-                    setSelectedMember={
-                      setSelectedMember
-                    }
-                  />
-                }
-              />
+</BrowserRouter>
 
-              {/* CARI ANGGOTA */}
+)}
 
-              <Route
-                path="/carianggota"
-                element={
-                  <Carianggota
-                    showToast={
-                      showToast
-                    }
-                    setLoader={
-                      setLoader
-                    }
-                  />
-                }
-              />
+</>
 
-              {/* CHATBOT */}
+);
 
-              <Route
-                path="/chatbot"
-                element={
-                  <ChatBotPage />
-                }
-              />
-
-            </Routes>
-
-          </div>
-
-        </BrowserRouter>
-
-      )}
-
-    </>
-  );
 }

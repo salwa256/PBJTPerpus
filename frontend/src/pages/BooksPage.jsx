@@ -737,25 +737,25 @@ async function handleDeleteBook(
       b.id
     )
   }
-  className="delete-btn"
-  style={{
-    background:
-      "#ef4444",
-    color:
-      "#fff",
-    border:
-      "none",
-    borderRadius: 10,
-    padding:
-      "7px 12px",
-    fontSize: 12,
-    fontWeight: 700,
-    cursor:
-      "pointer",
-  }}
->
-  🗑
-</button>
+        className="delete-btn"
+        style={{
+          background:
+            "#ef4444",
+          color:
+            "#fff",
+          border:
+            "none",
+          borderRadius: 10,
+          padding:
+            "7px 12px",
+          fontSize: 12,
+          fontWeight: 700,
+          cursor:
+            "pointer",
+        }}
+      >
+        🗑
+      </button>
 
                         )}
 
