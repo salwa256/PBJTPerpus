@@ -164,49 +164,52 @@ export default function BooksPage({
 
   // ───────── DELETE ─────────
 
-  async function handleDeleteBook(
-    id
-  ) {
+async function handleDeleteBook(
+  id
+) {
 
-    if (
-      !confirm(
-        "Hapus koleksi ini?"
-      )
-    ) return;
+  if (
+    !confirm(
+      "Hapus koleksi ini?"
+    )
+  ) return;
 
-    setLoader(
-      true,
-      "Menghapus..."
-    );
+  setLoader(
+    true,
+    "Menghapus..."
+  );
 
-    try {
+  try {
 
+    const r =
       await apiFetch(
         `/books/${encodeURIComponent(id)}`,
         "DELETE"
-        )
-
-      showToast(
-        r.message,
-        "ok"
       );
 
-      loadBooks();
+    showToast(
+      r.message ||
+      "Koleksi berhasil dihapus",
+      "ok"
+    );
 
-    } catch (e) {
+    await loadBooks();
 
-      showToast(
-        e.message,
-        "err"
-      );
+  } catch (e) {
 
-    } finally {
+    showToast(
+      e.message ||
+      "Gagal menghapus buku",
+      "err"
+    );
 
-      setLoader(false);
+  } finally {
 
-    }
+    setLoader(false);
+
   }
 
+}
   // ───────── UPDATE FORM ─────────
 
   function updateForm(
@@ -729,30 +732,30 @@ export default function BooksPage({
                           "tersedia" && (
 
                           <button
-                            onClick={() =>
-                              handleDeleteBook(
-                                b.id
-                              )
-                            }
-                            className="delete-btn"
-                            style={{
-                              background:
-                                "#ef4444",
-                              color:
-                                "#fff",
-                              border:
-                                "none",
-                              borderRadius: 10,
-                              padding:
-                                "7px 12px",
-                              fontSize: 12,
-                              fontWeight: 700,
-                              cursor:
-                                "pointer",
-                            }}
-                          >
-                            🗑
-                          </button>
+  onClick={() =>
+    handleDeleteBook(
+      b.id
+    )
+  }
+  className="delete-btn"
+  style={{
+    background:
+      "#ef4444",
+    color:
+      "#fff",
+    border:
+      "none",
+    borderRadius: 10,
+    padding:
+      "7px 12px",
+    fontSize: 12,
+    fontWeight: 700,
+    cursor:
+      "pointer",
+  }}
+>
+  🗑
+</button>
 
                         )}
 
