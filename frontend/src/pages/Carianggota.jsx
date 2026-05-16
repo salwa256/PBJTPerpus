@@ -182,9 +182,9 @@ export default function Carianggota({
     try {
 
       await apiFetch(
-        `/members/${id}`,
-        "DELETE"
-      );
+      `/members/${encodeURIComponent(id)}`,
+      "DELETE"
+      )
 
       showToast(
         "Anggota berhasil dihapus",

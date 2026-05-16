@@ -135,9 +135,9 @@ export default function MembersPage({
 
     try {
       const r = await apiFetch(
-        `/members/${member.id}`,
-        "DELETE"
-      );
+      `/members/${encodeURIComponent(id)}`,
+      "DELETE"
+      )
 
       showToast(r.message, "ok");
       loadMembers();

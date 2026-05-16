@@ -25,7 +25,7 @@ src="/PBJT.png"
 
 style={{
 
-width:"clamp(140px,25vw,300px)",
+width:"clamp(300px,25vw,600px)",
 
 height:"auto",
 

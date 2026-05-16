@@ -901,7 +901,80 @@ ON l.book_id = b.id
         f"Buku '{loan['book_title']}' berhasil dikembalikan"
     }
 
+# =========================
+# DELETE MEMBER
+# =========================
 
+@app.delete("/members/{member_id:path}")
+def delete_member(member_id: str):
+
+    db = get_db()
+    cur = db.cursor()
+
+    try:
+
+        # cek member ada
+        cur.execute("""
+            SELECT *
+            FROM members
+            WHERE TRIM(member_code)=TRIM(%s)
+            OR TRIM(nim)=TRIM(%s)
+        """,(member_id,member_id))
+
+        member = cur.fetchone()
+
+        if not member:
+
+            raise HTTPException(
+                status_code=404,
+                detail="Member tidak ditemukan"
+            )
+
+        # cek pinjaman aktif
+        cur.execute("""
+            SELECT *
+            FROM loans
+            WHERE member_id=%s
+            AND status IN(
+                'dipinjam',
+                'terlambat'
+            )
+        """,(member["member_code"],))
+
+        activeLoan = cur.fetchone()
+
+        if activeLoan:
+
+            raise HTTPException(
+                status_code=400,
+                detail="Member masih memiliki pinjaman aktif"
+            )
+
+        cur.execute("""
+            DELETE
+            FROM members
+            WHERE id=%s
+        """,(member["id"],))
+
+        db.commit()
+
+        return{
+            "message":
+            "Member berhasil dihapus"
+        }
+
+    except Exception as e:
+
+        db.rollback()
+
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )
+
+    finally:
+
+        db.close()
 # =========================
 # RUN SERVER
 # =========================
