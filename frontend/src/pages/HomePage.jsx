@@ -234,6 +234,56 @@ export default function HomePage({
       }
 
     }
+      @media(max-width:768px){
+
+.glass-box{
+
+overflow-x:auto;
+
+-webkit-overflow-scrolling:touch;
+
+}
+
+.glass-box::-webkit-scrollbar{
+
+height:6px;
+
+}
+
+.glass-box::-webkit-scrollbar-thumb{
+
+background:#d1d5db;
+
+border-radius:999px;
+
+}
+@media(max-width:768px){
+
+.glass-box{
+
+overflow-x:auto;
+
+-webkit-overflow-scrolling:touch;
+
+}
+
+.glass-box::-webkit-scrollbar{
+
+height:8px;
+
+}
+
+.glass-box::-webkit-scrollbar-thumb{
+
+background:#c7c7c7;
+
+border-radius:999px;
+
+}
+
+}
+
+}
 
   `;
 
@@ -279,7 +329,7 @@ export default function HomePage({
               className="quick-btn"
               style={{
                 background:
-                  "linear-gradient(135deg,#4f46e5,#7c3aed)",
+                  "#2f35d7",
                 color: "#fff",
                 border: "none",
                 borderRadius: 14,
@@ -1066,20 +1116,20 @@ function StatCards({
 // ═══════════════════════════════════════════════════════
 
 const tableWrapStyle = {
-  background:
-    "rgba(255,255,255,.92)",
-  border:
-    "1px solid rgba(255,255,255,.4)",
-  overflow: "hidden",
-  backdropFilter:
-    "blur(12px)",
-};
+  background:"rgba(255,255,255,.92)",
+  border:"1px solid rgba(255,255,255,.4)",
 
+  overflowX:"scroll",
+  overflowY:"hidden",
+
+  WebkitOverflowScrolling:"touch",
+  backdropFilter:"blur(12px)"
+};
 const tableStyle = {
-  width: "100%",
-  borderCollapse:
-    "collapse",
-  minWidth: 700,
+  width:"100%",
+  borderCollapse:"collapse",
+
+  minWidth:"900px"
 };
 
 const thStyle = {

@@ -1,7 +1,7 @@
 // ═══════════════════════════════════════════════════════
 // pages/Carianggota.jsx
 // ═══════════════════════════════════════════════════════
-
+import avatar from "../assets/anggota.png";
 import { useState } from "react";
 
 import {
@@ -379,6 +379,64 @@ export default function Carianggota({
 
         }
 
+        .primary-btn{
+
+background:
+#2f35d7;
+);
+
+color:#fff;
+
+border:none;
+
+border-radius:18px;
+
+padding:
+0 24px;
+
+font-weight:700;
+
+cursor:pointer;
+
+box-shadow:
+0 10px 20px
+rgba(79,70,229,.22);
+
+height:54px;
+
+}
+
+
+.search-btn{
+
+transition:.2s;
+
+}
+
+.search-btn:hover{
+
+transform:
+scale(1.03);
+
+}
+
+
+@media(max-width:768px){
+
+.search-flex{
+
+flex-direction:
+column;
+
+}
+
+.search-btn{
+
+width:100%!important;
+
+}
+
+}
       `}</style>
 
       {/* ───────── PAGE ───────── */}
@@ -405,18 +463,74 @@ export default function Carianggota({
           }}
         >
 
-          <input
-            className="modern-input"
-            placeholder="
+          <div
+className="search-flex"
+style={{
+
+display:"flex",
+
+gap:12,
+
+alignItems:"center"
+
+}}
+>
+
+<input
+className="modern-input"
+
+placeholder="
 Cari nama / NIM / kode anggota...
 "
-            value={query}
-            onChange={(e) =>
-              searchMembers(
-                e.target.value
-              )
-            }
-          />
+
+value={query}
+
+onChange={(e)=>
+setQuery(
+e.target.value
+)
+}
+
+onKeyDown={(e)=>{
+
+if(
+e.key==="Enter"
+){
+
+searchMembers(query);
+
+}
+
+}}
+/>
+
+
+<button
+
+className="
+primary-btn search-btn
+"
+
+onClick={()=>
+searchMembers(query)
+}
+
+style={{
+
+width:"170px",
+
+flexShrink:0
+
+}}
+
+>
+
+Cari
+
+</button>
+
+</div>
+          
 
         </div>
 
@@ -490,34 +604,35 @@ member-card glass-card
                 }}
               />
 
-              {/* AVATAR */}
-
-              <div
+               {/* AVATAR */}
+              
+                            <div
                 style={{
-                  width: 68,
-                  height: 68,
-                  borderRadius: 20,
-                  background:
-                    "linear-gradient(135deg,#4f46e5,#7c3aed)",
-
-                  display: "flex",
-
-                  alignItems: "center",
-
-                  justifyContent: "center",
-
-                  fontSize: 30,
-
-                  color: "#fff",
-
-                  marginBottom: 18,
-
-                  boxShadow:
-                    "0 10px 20px rgba(79,70,229,.24)",
+                  width:68,
+                  height:68,
+                  borderRadius:20,
+                  overflow:"hidden",
+                  marginBottom:18,
+              
                 }}
               >
-                👨‍🎓
+              
+              <img src={avatar}
+              alt="profile"
+              
+              style={{
+              
+              width:"100%",
+              
+              height:"100%",
+              
+              objectFit:"cover"
+              
+              }}
+              />
+              
               </div>
+              
 
               {/* NAME */}
 

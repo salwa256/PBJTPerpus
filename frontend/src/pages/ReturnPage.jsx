@@ -20,6 +20,7 @@ import {
   formatDate,
 } from "../utils/helpers";
 
+import bukuKosong from "../assets/buku.png";
 export default function ReturnPage({
   showToast,
   setLoader,
@@ -465,11 +466,7 @@ export default function ReturnPage({
           border-radius: 16px;
 
           background:
-            linear-gradient(
-              135deg,
-              #4f46e5,
-              #7c3aed
-            );
+            #2f35d7;
 
           color: white;
 
@@ -535,7 +532,7 @@ export default function ReturnPage({
           border-radius: 14px;
 
           background:
-            #4f46e5;
+            #2f35d7;
 
           color: white;
 
@@ -673,19 +670,29 @@ export default function ReturnPage({
               style={{
                 textAlign: "center",
                 marginTop: 100,
+                color: "#777",
               }}
             >
 
-              <div
+              <img
+                src={bukuKosong}
+                alt="kosong"
+
                 style={{
-                  fontSize: 70,
+
+                width:80,
+
+                height:80,
+
+                objectFit:"contain",
+
+                marginBottom:12
+
                 }}
-              >
-                📚
-              </div>
+                />
 
               <h2>
-                Belum Ada Data
+                Belum Ada Data Peminjam
               </h2>
 
 
@@ -706,7 +713,7 @@ export default function ReturnPage({
               >
 
                 <h2>
-                  {member.name}
+                  {member.borrower_name}
                 </h2>
 
                 <p
@@ -758,7 +765,7 @@ export default function ReturnPage({
                       }
                       className="return-btn"
                     >
-                      ✔ Kembalikan Buku
+                      Kembalikan Buku
                     </button>
 
                   </div>

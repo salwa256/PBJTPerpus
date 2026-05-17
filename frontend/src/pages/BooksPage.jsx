@@ -338,6 +338,56 @@ async function handleDeleteBook(
 
         }
 
+        /* ========================= */
+/* RESPONSIVE TABLE */
+/* ========================= */
+
+.table-wrapper{
+
+overflow-x:auto;
+
+-webkit-overflow-scrolling:touch;
+
+}
+
+.table-wrapper::-webkit-scrollbar{
+
+height:7px;
+
+}
+
+.table-wrapper::-webkit-scrollbar-thumb{
+
+background:#d1d5db;
+
+border-radius:999px;
+
+}
+
+@media(max-width:768px){
+
+.table-row td{
+
+padding:12px 10px !important;
+
+font-size:12px;
+
+}
+.table-wrapper{
+overflow-x:auto;
+-webkit-overflow-scrolling:touch;
+}
+
+.table-wrapper::-webkit-scrollbar{
+height:8px;
+}
+
+.table-wrapper::-webkit-scrollbar-thumb{
+background:#d1d5db;
+border-radius:999px;
+}
+}
+
       `}</style>
 
       {/* ───────── PAGE ───────── */}
@@ -594,17 +644,21 @@ async function handleDeleteBook(
           </div>
 
           <div
-            className="glass-card"
-            style={{
-              overflow: "hidden",
-            }}
-          >
+  className="glass-card table-wrapper"
+  style={{
+    overflowX:"auto",
+    overflowY:"hidden",
+    WebkitOverflowScrolling:"touch",
+  }}
+>
 
             <table
               style={{
                 width: "100%",
+                minWidth: "850px",
                 borderCollapse:
                   "collapse",
+                  borderCollapse: "collapse",
               }}
             >
 

@@ -393,6 +393,150 @@ p {
 .empty-state {
   animation: fadeIn 1s ease;
 }
+
+/* ========================= */
+/* RESPONSIVE */
+/* ========================= */
+
+/* TABLET */
+
+@media (max-width: 1024px){
+
+.page{
+
+padding:40px 30px;
+
+}
+
+.book-list{
+
+grid-template-columns:
+repeat(
+auto-fill,
+minmax(250px,1fr)
+);
+
+gap:20px;
+
+}
+
+.book-image{
+
+height:240px;
+
+}
+
+}
+
+
+/* HP */
+
+@media (max-width:768px){
+
+.page{
+
+padding:20px 16px;
+
+}
+
+.filter{
+
+gap:16px;
+
+}
+
+.filter button{
+
+width:100%;
+
+height:50px;
+
+align-self:stretch;
+
+}
+
+.book-list{
+
+margin-top:40px;
+
+grid-template-columns:1fr;
+
+gap:18px;
+
+}
+
+.book-card{
+
+min-height:auto;
+
+padding:16px;
+
+border-radius:22px;
+
+}
+
+.book-image{
+
+height:220px;
+
+}
+
+.book-title{
+
+font-size:16px;
+
+}
+
+.author{
+
+font-size:14px;
+
+}
+
+.bottom-row{
+
+flex-direction:column;
+
+align-items:flex-start;
+
+gap:10px;
+
+}
+
+}
+
+
+/* HP KECIL */
+
+@media (max-width:480px){
+
+.page{
+
+padding:14px;
+
+}
+
+.book-image{
+
+height:180px;
+
+}
+
+.book-title{
+
+font-size:15px;
+
+}
+
+.status{
+
+font-size:11px;
+
+padding:6px 10px;
+
+}
+
+}
   `;
 
   // SEARCH

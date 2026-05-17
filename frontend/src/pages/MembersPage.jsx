@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { apiFetch } from "../utils/api";
 import { useNavigate } from "react-router-dom";
+import avatar from "../assets/anggota.png";
 
 export default function MembersPage({
   showToast,
@@ -130,32 +131,59 @@ export default function MembersPage({
     });
   }
 
-  async function handleDelete(member) {
-    if (!window.confirm(`Hapus anggota ${member.name}?`)) {
-      return;
-    }
+  async function handleDelete(id) {
 
-    setLoader(true, "Menghapus anggota...");
+  if(
+    !window.confirm(
+      "Hapus anggota ini?"
+    )
+  ) return;
 
-    try {
-      const r = await apiFetch(
+  setLoader(
+    true,
+    "Menghapus anggota..."
+  );
+
+  try {
+
+    const r =
+      await apiFetch(
+
       `/members/${encodeURIComponent(id)}`,
+
       "DELETE"
-      )
 
-      showToast(r.message, "ok");
-      loadMembers();
+    );
 
-      if (editingMemberId === member.id) {
-        cancelEdit();
-      }
-    } catch (e) {
-      showToast(e.message, "err");
-    } finally {
-      setLoader(false);
+    showToast(
+      r.message,
+      "ok"
+    );
+
+    loadMembers();
+
+    if(
+      editingMemberId===id
+    ){
+
+      cancelEdit();
+
     }
+
+  } catch(e){
+
+    showToast(
+      e.message,
+      "err"
+    );
+
+  } finally {
+
+    setLoader(false);
+
   }
 
+}
   return (
     <>
 
@@ -483,24 +511,31 @@ export default function MembersPage({
               {/* AVATAR */}
 
               <div
-                style={{
-                  width: 68,
-                  height: 68,
-                  borderRadius: 20,
-                  background:
-                    "linear-gradient(135deg,#4f46e5,#7c3aed)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 30,
-                  color: "#fff",
-                  marginBottom: 18,
-                  boxShadow:
-                    "0 10px 20px rgba(79,70,229,.24)",
-                }}
-              >
-                👨‍🎓
-              </div>
+  style={{
+    width:68,
+    height:68,
+    borderRadius:20,
+    overflow:"hidden",
+    marginBottom:18,
+
+  }}
+>
+
+<img src={avatar}
+alt="profile"
+
+style={{
+
+width:"100%",
+
+height:"100%",
+
+objectFit:"cover"
+
+}}
+/>
+
+</div>
 
               {/* NAME */}
 
@@ -597,22 +632,37 @@ export default function MembersPage({
                     >
                       Edit
                     </button>
-                    <button
-                      onClick={() => handleDelete(m)}
-                      style={{
-                        flex: 1,
-                        minWidth: 120,
-                        background: "#fee2e2",
-                        color: "#991b1b",
-                        border: "1px solid rgba(248,113,113,.3)",
-                        borderRadius: 14,
-                        padding: "12px",
-                        fontWeight: 700,
-                        cursor: "pointer",
-                      }}
-                    >
-                      Hapus
-                    </button>
+                    {/* DELETE */}
+
+                  <button
+                    onClick={() =>
+                      handleDelete(
+                        m.id
+                      )
+                    }
+                    style={{
+                      flex: 1,
+
+                      background:
+                        "#fee2e2",
+
+                      color:
+                        "#991b1b",
+
+                      border: "none",
+
+                      borderRadius: 14,
+
+                      padding: 12,
+
+                      fontWeight: 700,
+
+                      cursor: "pointer",
+                    }}
+                  >
+                    Hapus
+                  </button>
+
                   </div>
                 </div>
 

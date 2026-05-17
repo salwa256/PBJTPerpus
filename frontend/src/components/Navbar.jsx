@@ -186,7 +186,7 @@ sidebarOpen
 
 zIndex:999,
 
-background:"#4f46e5",
+background:"#2f35d7",
 
 color:"#fff",
 

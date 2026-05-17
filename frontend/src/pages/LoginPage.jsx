@@ -102,7 +102,7 @@ export default function LoginPage({ onLogin, showToast, setLoader }) {
           border: none;
           border-radius: 16px;
           padding: 15px;
-          background: linear-gradient(135deg, #6ea8ff 0%, #4f7cff 100%);
+          background: #2f35d7;
           color: #fff;
           font-size: 18px;
           font-weight: 700;

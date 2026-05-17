@@ -214,11 +214,78 @@ export default function SearchBookPage({
 
           }
 
-          .search-btn {
+          .search-btn{
 
-            width: 100%;
+width:100%;
 
-          }
+height:52px;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+font-size:15px;
+
+margin-top:8px;
+
+flex-shrink:0;
+
+}
+
+@media (max-width:1024px){
+
+.search-flex{
+
+gap:14px;
+
+}
+
+.search-btn{
+
+min-width:160px;
+
+}
+
+}
+
+@media (max-width:768px){
+
+.book-grid{
+
+grid-template-columns:
+1fr !important;
+
+}
+
+.search-flex{
+
+flex-direction:column;
+
+gap:12px;
+
+}
+
+.search-btn{
+
+width:100%;
+
+height:52px;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+font-size:15px;
+
+margin-top:8px;
+
+}
+
+}
 
         }
 
@@ -275,7 +342,7 @@ search-btn
 "
               style={{
                 background:
-                  "linear-gradient(135deg,#4f46e5,#7c3aed)",
+                  "#2f35d7",
 
                 color: "#fff",
 
@@ -337,7 +404,7 @@ search-btn
                     "4px solid #e5e7eb",
 
                   borderTop:
-                    "4px solid #4f46e5",
+                    "4px solid #352beb",
 
                   borderRadius: "50%",
 
