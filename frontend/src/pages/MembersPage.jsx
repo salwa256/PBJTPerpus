@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { apiFetch } from "../utils/api";
 import { useNavigate } from "react-router-dom";
 import avatar from "../assets/anggota.png";
+import FormField, { inputStyle } from "../components/FormField";
 
 export default function MembersPage({
   showToast,
@@ -238,7 +239,7 @@ export default function MembersPage({
         }
 
         .submit-btn:hover {
-          transform: scale(1.02);
+          transform: scale(1.01);
           opacity: .95;
         }
 
@@ -289,6 +290,35 @@ export default function MembersPage({
 
         }
 
+        /* Table styles for members list */
+        .members-table {
+          width: 100%;
+          border-collapse: collapse;
+          font-size: 14px;
+        }
+
+        .members-table th,
+        .members-table td {
+          padding: 12px 16px;
+          border-bottom: 1px solid rgba(0,0,0,.06);
+          text-align: left;
+          vertical-align: middle;
+        }
+
+        .members-table thead th {
+          background: rgba(15,23,42,.04);
+          font-weight: 700;
+        }
+
+        .members-table tbody tr:hover {
+          background: rgba(79,70,229,.03);
+        }
+
+        .actions-cell {
+          display: flex;
+          gap: 8px;
+          justify-content: flex-end;
+        }
       `}</style>
 
       <div
@@ -332,79 +362,122 @@ export default function MembersPage({
 
           <div className="form-grid">
             
+            <FormField label="Kode Anggota">
+              <input
+                className="modern-input"
+                placeholder="ANGGT-001"
+                style={{
+                  ...inputStyle,
+                  borderRadius: 8,
+                  padding: 14,
+                }}
+                value={form.member_code}
+                onChange={(e) =>
+                  update(
+                    "member_code",
+                    e.target.value
+                  )
+                }
+              />
+            </FormField>
 
-            <input
-              className="modern-input"
-              placeholder="Kode Anggota"
-              value={form.member_code}
-              onChange={(e) =>
-                update(
-                  "member_code",
-                  e.target.value
-                )
-              }
-            />
+            <FormField label="Nama">
+              <input
+                className="modern-input"
+                placeholder="Nama Lengkap"
+                style={{
+                  ...inputStyle,
+                  borderRadius: 8,
+                  padding: 14,
+                }}
+                value={form.name}
+                onChange={(e) =>
+                  update(
+                    "name",
+                    e.target.value
+                  )
+                }
+              />
+            </FormField>
 
-            <input
-              className="modern-input"
-              placeholder="Nama Lengkap"
-              value={form.name}
-              onChange={(e) =>
-                update(
-                  "name",
-                  e.target.value
-                )
-              }
-            />
+            <FormField label="NIM">
+              <input
+                className="modern-input"
+                placeholder="23.1.9.0000"
+                style={{
+                  ...inputStyle,
+                  borderRadius: 8,
+                  padding: 14,
+                }}
+                value={form.nim}
+                onChange={(e) =>
+                  update(
+                    "nim",
+                    e.target.value
+                  )
+                }
+              />
+            </FormField>
 
-            <input
-              className="modern-input"
-              placeholder="NIM"
-              value={form.nim}
-              onChange={(e) =>
-                update(
-                  "nim",
-                  e.target.value
-                )
-              }
-            />
+            <FormField label="Jurusan">
+              <input
+                className="modern-input"
+                placeholder="Teknik Informatika"
+                style={{
+                  ...inputStyle,
+                  borderRadius: 8,
+                  padding: 14,
+                }}
+                value={form.major}
+                onChange={(e) =>
+                  update(
+                    "major",
+                    e.target.value
+                  )
+                }
+              />
+            </FormField>
 
-            <input
-              className="modern-input"
-              placeholder="Jurusan"
-              value={form.major}
-              onChange={(e) =>
-                update(
-                  "major",
-                  e.target.value
-                )
-              }
-            />
+            <FormField label="No Telepon">
+              <input
+                className="modern-input"
+                placeholder="08123456789"
+                style={{
+                  ...inputStyle,
+                  borderRadius: 8,
+                  padding: 14,
+                  minHeight: 110,
+                }}
+                value={form.phone}
+                onChange={(e) =>
+                  update(
+                    "phone",
+                    e.target.value
+                  )
+                }
+              />
+            </FormField>
 
-            <input
-              className="modern-input"
-              placeholder="No Telepon"
-              value={form.phone}
-              onChange={(e) =>
-                update(
-                  "phone",
-                  e.target.value
-                )
-              }
-            />
-
-            <textarea
-              className="modern-input"
-              placeholder="Alamat"
-              rows={4}
-              value={form.address}
-              onChange={(e) =>
-                update(
-                  "address",
-                  e.target.value
-                )
-              }
-            />
+            <FormField label="Alamat">
+              <textarea
+                className="modern-input"
+                placeholder="Alamat lengkap"
+                rows={4}
+                style={{
+                  ...inputStyle,
+                  borderRadius: 8,
+                  padding: 14,
+                  minHeight: 110,
+                }}
+                value={form.address}
+                onChange={(e) =>
+                  update(
+                    "address",
+                    e.target.value
+                  )
+                }
+              />
+            </FormField>
 
           </div>
 
@@ -424,7 +497,7 @@ export default function MembersPage({
                 flex: 1,
                 minWidth: 180,
                 background:
-                  "linear-gradient(135deg,#4f46e5,#7c3aed)",
+                  "rgb(47, 53, 215)",
                 color: "#fff",
                 border: "none",
                 borderRadius: 14,
@@ -438,7 +511,7 @@ export default function MembersPage({
             >
               {editingMemberId
                 ? "Simpan Perubahan"
-                : "+ Tambah Anggota"}
+                : "Tambah Anggota"}
             </button>
 
             {editingMemberId && (
@@ -478,198 +551,82 @@ export default function MembersPage({
           Daftar Anggota
         </div>
 
-        <div className="member-grid">
-
-          {members.map((m) => (
-
-            <div
-              key={m.id}
-              className="member-card glass-card"
-              style={{
-                borderRadius: 24,
-                padding: 22,
-                position: "relative",
-                overflow: "hidden",
-              }}
-            >
-
-              {/* GLOW */}
-
-              <div
-                style={{
-                  position: "absolute",
-                  right: -25,
-                  top: -25,
-                  width: 90,
-                  height: 90,
-                  borderRadius: "50%",
-                  background:
-                    "rgba(79,70,229,.08)",
-                }}
-              />
-
-              {/* AVATAR */}
-
-              <div
-  style={{
-    width:68,
-    height:68,
-    borderRadius:20,
-    overflow:"hidden",
-    marginBottom:18,
-
-  }}
->
-
-<img src={avatar}
-alt="profile"
-
-style={{
-
-width:"100%",
-
-height:"100%",
-
-objectFit:"cover"
-
-}}
-/>
-
-</div>
-
-              {/* NAME */}
-
-              <div
-                style={{
-                  fontSize: 18,
-                  fontWeight: 700,
-                  marginBottom: 8,
-                }}
-              >
-                {m.name}
-              </div>
-
-              {/* MEMBER CODE */}
-
-              <div
-                style={{
-                  display: "inline-block",
-                  background: "#eef2ff",
-                  color: "#4f46e5",
-                  padding: "6px 12px",
-                  borderRadius: 999,
-                  fontSize: 12,
-                  fontWeight: 700,
-                  marginBottom: 16,
-                }}
-              >
-                {m.member_code}
-              </div>
-
-              {/* INFO */}
-
-              <div
-                style={{
-                    fontSize: 14,
-                    color: "#555",
-                    lineHeight: 1.8,
-                }}
-                >
-                <div>{m.nim}</div>
-                <div>{m.major}</div>
-                <div>{m.phone}</div>
-                </div>
-
-                <div
-                  style={{
-                    display: "grid",
-                    gap: 10,
-                    marginTop: 16,
-                  }}
-                >
-                  <button
-                    onClick={() => {
-                      setSelectedMember(m);
-                      navigate("/borrow", {
-                        state: m,
-                      });
-                    }}
-                    style={{
-                      width: "100%",
-                      background:
-                        "linear-gradient(135deg,#4f46e5,#7c3aed)",
-                      color: "#fff",
-                      border: "none",
-                      borderRadius: 14,
-                      padding: "12px",
-                      fontWeight: 700,
-                      cursor: "pointer",
-                    }}
-                  >
-                    Gunakan Anggota
-                  </button>
-
-                  <div
-                    style={{
-                      display: "flex",
-                      gap: 8,
-                      flexWrap: "wrap",
-                    }}
-                  >
+        <div>
+          <table className="members-table">
+            <thead>
+              <tr>
+                <th>Nama</th>
+                <th>Kode</th>
+                <th>NIM</th>
+                <th>Jurusan</th>
+                <th>Telepon</th>
+                <th style={{textAlign: "right"}}>Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {members.map((m) => (
+                <tr key={m.id}>
+                  <td style={{fontWeight:700}}>{m.name}</td>
+                  <td>{m.member_code}</td>
+                  <td>{m.nim}</td>
+                  <td>{m.major}</td>
+                  <td>{m.phone}</td>
+                  <td className="actions-cell">
                     <button
+                      className="submit-btn"
+                      onClick={() => {
+                        setSelectedMember(m);
+                        navigate("/borrow", { state: m });
+                      }}
+                      style={{
+                        background: "rgb(47, 53, 215)",
+                        color: "#fff",
+                        border: "none",
+                        borderRadius: 8,
+                        padding: "8px 12px",
+                        fontWeight: 700,
+                        cursor: "pointer",
+                      }}
+                    >
+                      Gunakan
+                    </button>
+
+                    <button
+                      className="submit-btn"
                       onClick={() => startEdit(m)}
                       style={{
-                        flex: 1,
-                        minWidth: 120,
                         background: "#eef2ff",
                         color: "#3730a3",
                         border: "1px solid rgba(79,70,229,.15)",
-                        borderRadius: 14,
-                        padding: "12px",
+                        borderRadius: 8,
+                        padding: "8px 12px",
                         fontWeight: 700,
                         cursor: "pointer",
                       }}
                     >
                       Edit
                     </button>
-                    {/* DELETE */}
 
-                  <button
-                    onClick={() =>
-                      handleDelete(
-                        m.id
-                      )
-                    }
-                    style={{
-                      flex: 1,
-
-                      background:
-                        "#fee2e2",
-
-                      color:
-                        "#991b1b",
-
-                      border: "none",
-
-                      borderRadius: 14,
-
-                      padding: 12,
-
-                      fontWeight: 700,
-
-                      cursor: "pointer",
-                    }}
-                  >
-                    Hapus
-                  </button>
-
-                  </div>
-                </div>
-
-              </div>
-
-          ))}
-
+                    <button
+                      className="submit-btn"
+                      onClick={() => handleDelete(m.id)}
+                      style={{
+                        background: "#fee2e2",
+                        color: "#991b1b",
+                        border: "none",
+                        borderRadius: 8,
+                        padding: "8px 12px",
+                        fontWeight: 700,
+                        cursor: "pointer",
+                      }}
+                    >
+                      Hapus
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
 
       </div>

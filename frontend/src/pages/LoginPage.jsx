@@ -100,7 +100,7 @@ export default function LoginPage({ onLogin, showToast, setLoader }) {
         .login-btn {
           width: 100%;
           border: none;
-          border-radius: 16px;
+          border-radius: 30px;
           padding: 15px;
           background: #2f35d7;
           color: #fff;

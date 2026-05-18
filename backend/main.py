@@ -17,6 +17,9 @@ import mysql.connector
 import shutil
 import uuid
 import os
+from apscheduler.schedulers.background import BackgroundScheduler
+from datetime import date,timedelta
+from wa import kirim_wa
 
 from psycopg2.extras import RealDictCursor
 
@@ -53,6 +56,7 @@ def get_db():
         DATABASE_URL,
         cursor_factory=RealDictCursor
     )
+
 
 # =========================
 # MODELS
@@ -1050,6 +1054,97 @@ def update_member(
     finally:
 
         db.close()
+
+# endpoint endpoint
+@app.get("/test-wa")
+def test_wa():
+
+    kirim_wa(
+        "628564xxxx",
+        "halo"
+    )
+
+    return {
+        "message":"WA terkirim"
+    }
+
+
+# fungsi cek jatuh tempo
+def cek_jatuh_tempo():
+
+    db=get_db()
+
+    cur=db.cursor(
+        dictionary=True
+    )
+
+    besok=(
+        date.today()
+        + timedelta(days=1)
+    )
+
+    cur.execute("""
+    SELECT
+    members.name,
+    members.phone,
+    books.title
+
+    FROM loans
+
+    JOIN members
+    ON members.id=
+    loans.member_id
+
+    JOIN books
+    ON books.id=
+    loans.book_id
+
+    WHERE DATE(
+    loans.due_date
+    )=%s
+    """,(besok,))
+
+    data= cur.fetchall()
+
+    for item in data:
+
+        pesan=f"""
+Halo {item['name']}
+
+Buku:
+{item['title']}
+
+akan jatuh tempo besok.
+"""
+
+        kirim_wa(
+            item["phone"],
+            pesan
+        )
+
+
+# TARUH DI SINI 😭🔥
+scheduler= BackgroundScheduler()
+
+scheduler.add_job(
+    cek_jatuh_tempo,
+    "cron",
+    hour=7
+)
+
+scheduler.start()
+
+
+if __name__=="__main__":
+
+    import uvicorn
+
+    uvicorn.run(
+        "main:app",
+        host="0.0.0.0",
+        port=8000,
+        reload=True
+    )
 # =========================
 # RUN SERVER
 # =========================

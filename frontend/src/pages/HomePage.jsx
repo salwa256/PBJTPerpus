@@ -188,11 +188,6 @@ export default function HomePage({
       transition: .2s;
     }
 
-    .quick-btn:hover {
-      transform: scale(1.05);
-      opacity: .92;
-    }
-
     .glass-box {
       background:
         rgba(255,255,255,.92);

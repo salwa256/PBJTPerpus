@@ -192,7 +192,7 @@ color:"#fff",
 
 border:"none",
 
-borderRadius:10,
+borderRadius:30,
 
 width:38,
 
@@ -381,8 +381,8 @@ active
 
 borderRadius:
 active
-?"20px 0 0 20px"
-:"18px",
+?"10px 10px 10px 10px"
+:"30px",
 
 color:
 active

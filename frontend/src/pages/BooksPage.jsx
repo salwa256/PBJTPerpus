@@ -298,7 +298,7 @@ async function handleDeleteBook(
         .modern-btn:hover {
 
           transform:
-            scale(1.03);
+            scale(1.01);
 
           opacity: .95;
 
@@ -611,7 +611,7 @@ border-radius:999px;
             style={{
               width: "100%",
               background:
-                "#2f35d7",
+                "rgb(47, 53, 215)",
               color: "#fff",
               border: "none",
               borderRadius: 14,
@@ -658,7 +658,6 @@ border-radius:999px;
                 minWidth: "850px",
                 borderCollapse:
                   "collapse",
-                  borderCollapse: "collapse",
               }}
             >
 

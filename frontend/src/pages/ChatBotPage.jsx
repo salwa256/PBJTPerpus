@@ -209,11 +209,7 @@ function ChatBotPage() {
         .msg.user{
 
           background:
-            linear-gradient(
-              135deg,
-              #4f46e5,
-              #4f46e5
-            );
+            rgb(47, 53, 215);
 
           color:white;
 
@@ -291,11 +287,7 @@ function ChatBotPage() {
           border-radius:50%;
 
           background:
-            linear-gradient(
-              135deg,
-              #4f46e5,
-              #4f46e5
-            );
+            rgb(47, 53, 215);
 
           color:white;
 

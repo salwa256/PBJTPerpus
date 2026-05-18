@@ -39,6 +39,11 @@ export default function Carianggota({
   ] = useState(false);
 
   const [
+    searchedQuery,
+    setSearchedQuery
+  ] = useState("");
+
+  const [
     editingMemberId,
     setEditingMemberId
   ] = useState(null);
@@ -59,13 +64,18 @@ export default function Carianggota({
 
     setQuery(q);
 
-    if (!q.trim()) {
+    const trimmed = q.trim();
+
+    if (!trimmed) {
 
       setResults([]);
+      setSearchedQuery("");
 
       return;
 
     }
+
+    setSearchedQuery(trimmed);
 
     setLoading(true);
 
@@ -378,6 +388,36 @@ export default function Carianggota({
           }
 
         }
+          @keyframes fadePage {
+
+          from {
+            opacity: 0;
+            transform:
+              translateY(20px);
+          }
+
+          to {
+            opacity: 1;
+            transform:
+              translateY(0);
+          }
+
+        }
+
+        @keyframes spin {
+
+          from {
+            transform:
+              rotate(0deg);
+          }
+
+          to {
+            transform:
+              rotate(360deg);
+          }
+
+        }
+
 
         .primary-btn{
 
@@ -402,7 +442,7 @@ box-shadow:
 0 10px 20px
 rgba(79,70,229,.22);
 
-height:54px;
+height:50px;
 
 }
 
@@ -480,7 +520,7 @@ alignItems:"center"
 className="modern-input"
 
 placeholder="
-Cari nama / NIM / kode anggota...
+Cari nama / NIM / kode anggota untuk meminjam buku.
 "
 
 value={query}
@@ -517,7 +557,7 @@ searchMembers(query)
 
 style={{
 
-width:"170px",
+width:"80px",
 
 flexShrink:0
 
@@ -534,8 +574,6 @@ Cari
 
         </div>
 
-        {/* LOADING */}
-
         {loading && (
 
           <div
@@ -545,7 +583,46 @@ Cari
               marginBottom: 20,
             }}
           >
-            Mencari anggota...
+
+            <div
+              style={{
+                display: "flex",
+
+                flexDirection:
+                  "column",
+
+                alignItems:
+                  "center",
+
+                gap: 14,
+              }}
+            >
+
+              <div
+                style={{
+                  width: 42,
+
+                  height: 42,
+
+                  border:
+                    "4px solid #e5e7eb",
+
+                  borderTop:
+                    "4px solid #352beb",
+
+                  borderRadius: "50%",
+
+                  animation:
+                    "spin .8s linear infinite",
+                }}
+              />
+
+              <div>
+                Mencari Anggota...
+              </div>
+
+            </div>
+
           </div>
 
         )}
@@ -553,14 +630,12 @@ Cari
         {/* EMPTY */}
 
         {!loading &&
-          query &&
+          searchedQuery &&
+          query === searchedQuery &&
           results.length === 0 && (
 
           <div
             style={{
-              background: "#fff",
-              padding: 24,
-              borderRadius: 20,
               textAlign: "center",
               color: "#777",
             }}

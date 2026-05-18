@@ -395,7 +395,7 @@ export default function BorrowPage({
               }}
             >
               Isi data peminjam
-              dan buku yang akan dipinjam
+              dan buku yang akan dipinjam, jika belum daftar tidak bisa meminjam buku.
             </div>
 
           </div>
@@ -662,7 +662,7 @@ export default function BorrowPage({
               width: "100%",
 
               background:
-                "linear-gradient(135deg,#4f46e5,#7c3aed)",
+                "rgb(47, 53, 215)",
 
               color: "#fff",
 
@@ -683,7 +683,7 @@ export default function BorrowPage({
                 "0 10px 22px rgba(79,70,229,.22)",
             }}
           >
-            Proses Peminjaman
+            Pinjam
           </button>
 
         </div>
