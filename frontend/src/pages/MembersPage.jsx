@@ -55,7 +55,6 @@ export default function MembersPage({
 
   const majorOptions = [
     "Teknik Informatika",
-    "Statistik",
     "Teknik Otomotif",
     "Teknik Elektronika Industri",
     "Teknik Mesin",
