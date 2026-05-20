@@ -43,7 +43,7 @@ export default defineConfig({
 	// Build output to 'dev-dist' to match existing service-worker/setup
 	build: {
 		outDir: "dev-dist",
-		emptyOutDir: false,
+		emptyOutDir: true,
 		assetsDir: "assets",
 	},
 });
