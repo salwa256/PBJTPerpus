@@ -17,6 +17,9 @@ export default function MembersPage({
     const [members, setMembers] =
     useState([]);
 
+  const [majorFilter, setMajorFilter] =
+    useState("");
+
   const [editingMemberId, setEditingMemberId] =
     useState(null);
 
@@ -49,6 +52,20 @@ export default function MembersPage({
 
     }
   }
+
+  const majorOptions = [
+    "Teknik Informatika",
+    "Statistik",
+    "Teknik Otomotif",
+    "Teknik Elektronika Industri",
+    "Teknik Mesin",
+  ];
+
+  const filteredMembers = members.filter(
+    (m) =>
+      !majorFilter ||
+      m.major === majorFilter
+  );
 
   async function handleSubmit() {
 
@@ -419,7 +436,7 @@ export default function MembersPage({
               />
             </FormField>
 
-            <FormField label="Jurusan">
+            <FormField label="Prodi">
               <input
                 className="modern-input"
                 placeholder="Teknik Informatika"
@@ -543,12 +560,48 @@ export default function MembersPage({
 
         <div
           style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            flexWrap: "wrap",
+            gap: 12,
             marginBottom: 18,
-            fontSize: 22,
-            fontWeight: 700,
           }}
         >
-          Daftar Anggota
+
+          <div
+            style={{
+              fontSize: 22,
+              fontWeight: 700,
+            }}
+          >
+            Daftar Anggota
+          </div>
+
+          <select
+            value={majorFilter}
+            onChange={(e) =>
+              setMajorFilter(e.target.value)
+            }
+            style={{
+              padding: "10px 14px",
+              border: "1px solid #ddd",
+              borderRadius: 10,
+              background: "#fff",
+              minWidth: 220,
+              cursor: "pointer",
+            }}
+          >
+            <option value="">
+              Semua Prodi
+            </option>
+            {majorOptions.map((major) => (
+              <option key={major} value={major}>
+                {major}
+              </option>
+            ))}
+          </select>
+
         </div>
 
         <div>
@@ -558,13 +611,13 @@ export default function MembersPage({
                 <th>Nama</th>
                 <th>Kode</th>
                 <th>NIM</th>
-                <th>Jurusan</th>
+                <th>Prodi</th>
                 <th>Telepon</th>
                 <th style={{textAlign: "right"}}>Aksi</th>
               </tr>
             </thead>
             <tbody>
-              {members.map((m) => (
+              {filteredMembers.map((m) => (
                 <tr key={m.id}>
                   <td style={{fontWeight:700}}>{m.name}</td>
                   <td>{m.member_code}</td>

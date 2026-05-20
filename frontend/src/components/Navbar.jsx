@@ -10,6 +10,7 @@ import rekomen from "../assets/rekomen.png";
 import out from "../assets/keluar.png";
 import anggota from "../assets/anggota.png";
 import chatbot from "../assets/chatbot.png";
+import logo from "../assets/logo.png";
 
 const TABS=[
 
@@ -294,16 +295,28 @@ minHeight:40
 <div
 style={{
 
-fontSize:18,
+marginLeft:70,
 
-marginLeft:45,
+marginTop:20,
 
-marginTop:30
+display:"flex",
+
+alignItems:"center",
+
+gap:12
 
 }}
 >
 
-PBJT Perpus
+<img
+  src={logo}
+  alt="PBJT Perpus"
+  style={{
+    width: 50,
+    height: 50,
+    objectFit: "contain",
+  }}
+/>
 
 </div>
 

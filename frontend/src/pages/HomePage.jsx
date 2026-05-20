@@ -42,6 +42,20 @@ export default function HomePage({
     const [selectedLoan, setSelectedLoan] =
       useState(null);
 
+  const [historyFilter, setHistoryFilter] =
+    useState(
+      new Date()
+        .toISOString()
+        .split("T")[0]
+    );
+
+  const [borrowFilter, setBorrowFilter] =
+    useState(
+      new Date()
+        .toISOString()
+        .split("T")[0]
+    );
+
   // ───────── LOAD DATA ─────────
 
   useEffect(() => {
@@ -121,6 +135,87 @@ export default function HomePage({
 
     }
   }
+
+  // ───────── FILTER HISTORY BY DATE ─────────
+
+  function normalizeDateString(value) {
+    if (!value) return "";
+    return value.split("T")[0].split(" ")[0];
+  }
+
+  function getHistoryByDate(date) {
+
+    return history.filter(
+      (h) => {
+
+        const returnDate =
+          normalizeDateString(
+            h.return_date
+          );
+
+        return returnDate === date;
+
+      }
+    );
+
+  }
+
+  // ───────── FILTER ACTIVE LOANS BY DATE ─────────
+
+  function getLoansByDate(date) {
+
+    return activeLoans.filter(
+      (l) => {
+
+        const borrowDate =
+          normalizeDateString(
+            l.borrow_date
+          );
+
+        return borrowDate === date;
+
+      }
+    );
+
+  }
+
+  // ───────── STYLE VARIABLES ─────────
+
+  const tableWrapStyle = {
+    overflowX: "auto",
+  };
+
+  const tableStyle = {
+    width: "100%",
+    borderCollapse: "collapse",
+    fontSize: "14px",
+  };
+
+  const thStyle = {
+    padding: "12px 16px",
+    textAlign: "left",
+    fontWeight: 600,
+    color: "#333",
+    borderBottom: "1px solid #eee",
+  };
+
+  const tdStyle = {
+    padding: "14px 16px",
+    borderBottom: "1px solid #eee",
+    color: "#333",
+  };
+
+  const btnDangerStyle = {
+    padding: "8px 16px",
+    background: "#ef4444",
+    color: "#fff",
+    border: "none",
+    borderRadius: "8px",
+    cursor: "pointer",
+    fontSize: "13px",
+    fontWeight: 600,
+    transition: ".2s",
+  };
 
   // ───────── STYLE ─────────
 
@@ -301,8 +396,7 @@ border-radius:999px;
           <div
             style={{
               display: "flex",
-              justifyContent:
-                "space-between",
+              justifyContent: "space-between",
               alignItems: "center",
               marginBottom: 16,
               flexWrap: "wrap",
@@ -319,27 +413,38 @@ border-radius:999px;
               Peminjaman Aktif
             </div>
 
-            <button
-              onClick={onGoToBorrow}
-              className="quick-btn"
+            <input
+              type="date"
+              value={borrowFilter}
+              onChange={(e) =>
+                setBorrowFilter(
+                  e.target.value
+                )
+              }
               style={{
-                background:
-                  "#2f35d7",
-                color: "#fff",
-                border: "none",
-                borderRadius: 14,
-                padding:
-                  "11px 18px",
-                fontWeight: 700,
+                padding: "8px 12px",
+                border: "1px solid #ddd",
+                borderRadius: 8,
+                fontSize: 14,
+                outline: "none",
                 cursor: "pointer",
-                boxShadow:
-                  "0 10px 22px rgba(79,70,229,.2)",
               }}
-            >
-              + Tambah Baru
-            </button>
+            />
 
           </div>
+
+          {/* ───────── SUMMARY PEMINJAMAN ───────── */}
+
+          {(() => {
+
+            const filtered =
+              getLoansByDate(
+                borrowFilter
+              );
+
+
+
+          })()}
 
           {/* ───────── TABLE PEMINJAMAN ───────── */}
 
@@ -383,41 +488,48 @@ border-radius:999px;
 
               <tbody>
 
-                {activeLoans.length ===
-                0 ? (
+                {(() => {
 
-                  <tr>
+                  const filtered =
+                    getLoansByDate(
+                      borrowFilter
+                    );
 
-                    <td
-                      colSpan={6}
-                      style={{
-                        textAlign:
-                          "center",
-                        padding: 40,
-                        color:
-                          "#999",
-                      }}
-                    >
-                      Tidak ada
-                      peminjaman aktif
-                    </td>
+                  return filtered.length === 0 ? (
 
-                  </tr>
+                    <tr>
 
-                ) : (
-
-                  activeLoans.map(
-                    (l) => (
-
-                      <tr
-                        key={l.book_id}
-                        className="table-row"
-                        onClick={() => setSelectedLoan(l)}
-                        style={{ cursor: "pointer" }}
+                      <td
+                        colSpan={6}
+                        style={{
+                          textAlign:
+                            "center",
+                          padding: 40,
+                          color:
+                            "#999",
+                        }}
                       >
+                        Tidak ada
+                        peminjaman pada
+                        tanggal ini
+                      </td>
 
-                        <td
-                          style={
+                    </tr>
+
+                  ) : (
+
+                    filtered.map(
+                      (l) => (
+
+                        <tr
+                          key={l.book_id}
+                          className="table-row"
+                          onClick={() => setSelectedLoan(l)}
+                          style={{ cursor: "pointer" }}
+                        >
+
+                          <td
+                            style={
                             tdStyle
                           }
                         >
@@ -533,9 +645,11 @@ border-radius:999px;
                       </tr>
 
                     )
+
+                  )
                   )
 
-                )}
+                })()}
 
               </tbody>
 
@@ -556,13 +670,101 @@ border-radius:999px;
 
   <div
     style={{
-      fontSize: 20,
-      fontWeight: 700,
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
       marginBottom: 18,
+      flexWrap: "wrap",
+      gap: 12,
     }}
   >
-    Riwayat Pengembalian
+
+    <div
+      style={{
+        fontSize: 20,
+        fontWeight: 700,
+      }}
+    >
+      Riwayat Pengembalian
+    </div>
+
+    <input
+      type="date"
+      value={historyFilter}
+      onChange={(e) =>
+        setHistoryFilter(
+          e.target.value
+        )
+      }
+      style={{
+        padding: "8px 12px",
+        border: "1px solid #ddd",
+        borderRadius: 8,
+        fontSize: 14,
+        outline: "none",
+        cursor: "pointer",
+      }}
+    />
+
   </div>
+
+  {/* SUMMARY */}
+
+  {(() => {
+
+    const filtered =
+      getHistoryByDate(
+        historyFilter
+      );
+
+    return (
+
+      <div
+        style={{
+          background: "#f9f9f9",
+          padding: 14,
+          borderRadius: 12,
+          marginBottom: 18,
+          textAlign: "center",
+        }}
+      >
+
+        <div
+          style={{
+            fontSize: 24,
+            fontWeight: 700,
+            color: "#2f35d7",
+          }}
+        >
+          {filtered.length}
+        </div>
+
+        <div
+          style={{
+            fontSize: 12,
+            color: "#999",
+            marginTop: 4,
+          }}
+        >
+          Buku dikembalikan pada{" "}
+          {new Date(
+            historyFilter
+          ).toLocaleDateString(
+            "id-ID",
+            {
+              weekday: "long",
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            }
+          )}
+        </div>
+
+      </div>
+
+    );
+
+  })()}
 
   {history.length === 0 ? (
 
@@ -579,117 +781,147 @@ border-radius:999px;
 
   ) : (
 
-    history
-      .slice(0, 8)
-      .map((h, i) => (
+    (() => {
+
+      const filtered =
+        getHistoryByDate(
+          historyFilter
+        );
+
+      return filtered.length === 0 ? (
 
         <div
-          key={i}
-          className="history-item"
-          onClick={() =>
-            setSelectedLoan(h)
-          }
           style={{
-            display: "flex",
-
-            justifyContent:
-              "space-between",
-
-            alignItems: "center",
-
-            padding: "14px 0",
-
-            borderBottom:
-              "1px solid rgba(0,0,0,.06)",
-
-            cursor: "pointer",
+            textAlign: "center",
+            padding: 20,
+            color: "#999",
+            fontSize: 13,
           }}
         >
 
-          {/* LEFT */}
+        </div>
 
-          <div>
+      ) : (
 
-            <div
-              style={{
-                fontWeight: 700,
-                marginBottom: 4,
-              }}
-            >
-              {h.book_title}
-            </div>
-
-            <div
-              style={{
-                fontSize: 12,
-                color: "#666",
-                marginBottom: 4,
-              }}
-            >
-              {h.borrower_name}
-            </div>
-
-            <div
-              style={{
-                fontSize: 11,
-                color: "#999",
-              }}
-            >
-              {h.member_id}
-            </div>
-
-          </div>
-
-          {/* RIGHT */}
+        filtered.map((h, i) => (
 
           <div
+            key={i}
+            className="history-item"
+            onClick={() =>
+              setSelectedLoan(h)
+            }
             style={{
-              textAlign: "right",
+              display: "flex",
+
+              justifyContent:
+                "space-between",
+
+              alignItems: "center",
+
+              padding: "14px 0",
+
+              borderBottom:
+                "1px solid rgba(0,0,0,.06)",
+
+              cursor: "pointer",
             }}
           >
 
-            <div
-              style={{
-                fontSize: 11,
-                color: "#999",
-                marginBottom: 8,
-              }}
-            >
-              {formatDate(
-                h.return_date
-              )}
+            {/* LEFT */}
+
+            <div>
+
+              <div
+                style={{
+                  fontWeight: 700,
+                  marginBottom: 4,
+                }}
+              >
+                {h.book_title}
+              </div>
+
+              <div
+                style={{
+                  fontSize: 12,
+                  color: "#666",
+                  marginBottom: 4,
+                }}
+              >
+                {h.borrower_name}
+              </div>
+
+              <div
+                style={{
+                  fontSize: 11,
+                  color: "#999",
+                }}
+              >
+                {h.member_id}
+              </div>
+
             </div>
 
+            {/* RIGHT */}
+
             <div
               style={{
-                display:
-                  "inline-block",
-
-                padding:
-                  "6px 12px",
-
-                borderRadius:
-                  999,
-
-                background:
-                  "#e6f9f0",
-
-                color:
-                  "#0f9d58",
-
-                fontSize: 11,
-
-                fontWeight: 700,
+                textAlign: "right",
               }}
             >
-              Dikembalikan
+
+              <div
+                style={{
+                  fontSize: 11,
+                  color: "#999",
+                  marginBottom: 8,
+                }}
+              >
+                {new Date(
+                  h.return_date
+                ).toLocaleTimeString(
+                  "id-ID",
+                  {
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  }
+                )}
+              </div>
+
+              <div
+                style={{
+                  display:
+                    "inline-block",
+
+                  padding:
+                    "6px 12px",
+
+                  borderRadius:
+                    999,
+
+                  background:
+                    "#e6f9f0",
+
+                  color:
+                    "#0f9d58",
+
+                  fontSize: 11,
+
+                  fontWeight: 700,
+                }}
+              >
+                Dikembalikan
+              </div>
+
             </div>
 
           </div>
 
-        </div>
+        ))
 
-      ))
+      );
+
+    })()
 
   )}
 

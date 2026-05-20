@@ -6,6 +6,7 @@
 import { useState } from "react";
 import perpusImg from "../assets/pltkbaja.png";
 import { apiFetch } from "../utils/api";
+import bg2 from "../assets/bg2.png";
 
 export default function LoginPage({ onLogin, showToast, setLoader }) {
   const [username, setUsername] = useState("");
@@ -135,7 +136,7 @@ export default function LoginPage({ onLogin, showToast, setLoader }) {
       <div
         style={{
           minHeight: "100vh",
-          backgroundImage: `url(${perpusImg})`,
+          backgroundImage: `url(${bg2})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
           display: "flex",
