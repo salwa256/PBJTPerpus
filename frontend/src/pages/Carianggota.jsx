@@ -149,42 +149,33 @@ export default function Carianggota({
 
   async function saveEdit() {
 
-    try {
+  try {
 
-      const r = await apiFetch(
-  isEditing
-    ? `/members/${encodeURIComponent(editingMemberId)}`
-    : "/members",
+    const r = await apiFetch(
+      `/members/${encodeURIComponent(editingMemberId)}`,
+      "PUT",
+      form
+    );
 
-  isEditing
-    ? "PUT"
-    : "POST",
+    showToast(
+      r.message || "Data anggota berhasil diperbarui",
+      "ok"
+    );
 
-  form
-);
+    setEditingMemberId(null);
 
-      showToast(
-        "Data anggota berhasil diperbarui",
-        "ok"
-      );
+    searchMembers(query);
 
-      setEditingMemberId(
-        null
-      );
+  } catch (e) {
 
-      searchMembers(query);
-
-    } catch (e) {
-
-      showToast(
-        e.message,
-        "err"
-      );
-
-    }
+    showToast(
+      e.message,
+      "err"
+    );
 
   }
 
+}
   // ───────── DELETE ─────────
 
   async function handleDelete(id) {

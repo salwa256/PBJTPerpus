@@ -739,7 +739,7 @@ export default function ReturnPage({
                   >
 
                     <h3>
-                      {loan.title}
+                      {loan.book_title}
                     </h3>
 
                     <p

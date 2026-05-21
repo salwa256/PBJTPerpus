@@ -17,13 +17,13 @@ export function formatDate(dateStr) {
 }
 
 /**
- * Mengembalikan tanggal hari ini dan 14 hari ke depan
+ * Mengembalikan tanggal hari ini dan 7 hari ke depan
  * dalam format YYYY-MM-DD (sesuai input type="date").
  */
 export function getTodayAndDueDate() {
   const today = new Date().toISOString().split("T")[0];
   const dueDate = new Date();
-  dueDate.setDate(dueDate.getDate() + 14);
+  dueDate.setDate(dueDate.getDate() + 7);
   return {
     today,
     due: dueDate.toISOString().split("T")[0],

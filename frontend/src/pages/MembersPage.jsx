@@ -335,6 +335,36 @@ export default function MembersPage({
           gap: 8px;
           justify-content: flex-end;
         }
+
+        .table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  border-radius: 12px;
+}
+
+.members-table {
+  width: 100%;
+  min-width: 850px;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+@media (max-width:768px){
+
+  .table-wrapper{
+    overflow-x: auto;
+  }
+
+  .members-table{
+    min-width: 900px;
+  }
+
+  .actions-cell{
+    flex-wrap: nowrap;
+  }
+
+}
       `}</style>
 
       <div
@@ -604,7 +634,8 @@ export default function MembersPage({
         </div>
 
         <div>
-          <table className="members-table">
+          <div className="table-wrapper">
+            <table className="members-table">
             <thead>
               <tr>
                 <th>Nama</th>
@@ -679,6 +710,7 @@ export default function MembersPage({
               ))}
             </tbody>
           </table>
+          </div>
         </div>
 
       </div>
