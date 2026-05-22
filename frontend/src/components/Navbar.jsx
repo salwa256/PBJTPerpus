@@ -1,23 +1,17 @@
 import React,{useEffect,useState} from "react";
 import { Link,useLocation } from "react-router-dom";
 
-import home from "../assets/home.png";
-import borrow from "../assets/borrow.png";
-import search from "../assets/search.png";
-import returnIcon from "../assets/return.png";
-import addbooks from "../assets/addbooks.png";
-import rekomen from "../assets/rekomen.png";
-import out from "../assets/keluar.png";
-import anggota from "../assets/anggota.png";
-import chatbot from "../assets/chatbot.png";
 import logo from "../assets/logo.png";
+
+import { Icon }
+from "@iconify/react";
 
 const TABS=[
 
 {
 id:"home",
 label:"Beranda",
-icon:home,
+icon:"solar:home-2-bold",
 path:"/",
 roles:["admin"]
 },
@@ -25,7 +19,7 @@ roles:["admin"]
 {
 id:"carianggota",
 label:"Cari Anggota",
-icon:search,
+icon:"hugeicons:user-search-01",
 path:"/carianggota",
 roles:["admin","petugas"]
 },
@@ -33,7 +27,7 @@ roles:["admin","petugas"]
 {
 id:"borrow",
 label:"Peminjaman",
-icon:borrow,
+icon:"solar:user-id-bold",
 path:"/borrow",
 roles:["admin","petugas"]
 },
@@ -41,7 +35,7 @@ roles:["admin","petugas"]
 {
 id:"return",
 label:"Pengembalian",
-icon:returnIcon,
+icon:"solar:book-bookmark-bold",
 path:"/return",
 roles:["admin","petugas"]
 },
@@ -49,7 +43,7 @@ roles:["admin","petugas"]
 {
 id:"search",
 label:"Cari Buku",
-icon:search,
+icon:"hugeicons:search-02",
 path:"/search",
 roles:["admin","petugas"]
 },
@@ -57,7 +51,7 @@ roles:["admin","petugas"]
 {
 id:"rekomendasi",
 label:"Rekomendasi Buku",
-icon:rekomen,
+icon:"solar:star-bold",
 path:"/rekomendasi",
 roles:["admin","petugas"]
 },
@@ -65,7 +59,7 @@ roles:["admin","petugas"]
 {
 id:"chatbot",
 label:"Asisten Perpus",
-icon:chatbot,
+icon:"solar:chat-round-dots-bold",
 path:"/chatbot",
 roles:["admin","petugas"]
 },
@@ -73,7 +67,7 @@ roles:["admin","petugas"]
 {
 id:"members",
 label:"Tambah Anggota",
-icon:anggota,
+icon:"solar:users-group-rounded-bold",
 path:"/members",
 roles:["admin"]
 },
@@ -81,13 +75,12 @@ roles:["admin"]
 {
 id:"books",
 label:"Tambah Koleksi Buku",
-icon:addbooks,
+icon:"solar:library-bold",
 path:"/books",
 roles:["admin"]
 }
 
 ];
-
 export default function Navbar({
 
 username,
@@ -413,20 +406,26 @@ marginRight:0
 
 >
 
-<img
+<Icon
 
-src={tab.icon}
-
-alt=""
+icon={tab.icon}
 
 style={{
 
-width:20,
-height:20
+fontSize:20,
+
+color:
+active
+?"#170ebb"
+:"#050505",
+
+flexShrink:0,
+
+display:"block"
 
 }}
-/>
 
+/>
 {sidebarOpen&&(
 
 <span>
@@ -558,12 +557,11 @@ borderRadius:10
 {sidebarOpen
 ?"Keluar"
 :
-<img
-src={out}
-alt=""
-style={{
-width:18
-}}
+<Icon
+icon="solar:logout-2-bold"
+width="20"
+height="20"
+color="#fff"
 />
 }
 

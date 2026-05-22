@@ -16,6 +16,9 @@ import {
   apiFetch,
 } from "../utils/api";
 
+import { Icon }
+from "@iconify/react";
+
 import {
   formatDate,
 } from "../utils/helpers";
@@ -629,10 +632,31 @@ export default function ReturnPage({
             }}
           >
 
-            {scanning
-              ? "Membaca Kartu..."
-              : "Scan Kartu"}
+            <div
+style={{
 
+display:"flex",
+
+alignItems:"center",
+
+justifyContent:"center",
+
+gap:8
+
+}}
+>
+
+<Icon
+icon="solar:camera-bold"
+width="22"
+height="22"
+/>
+
+{scanning
+? "Membaca Kartu..."
+: "Scan Kartu"}
+
+</div>
           </button>
 
           {/* INPUT MANUAL */}
@@ -655,8 +679,29 @@ export default function ReturnPage({
             onClick={searchManual}
             className="scan-btn"
           >
-            Cari Manual
-          </button>
+<div
+style={{
+
+display:"flex",
+
+alignItems:"center",
+
+justifyContent:"center",
+
+gap:8
+
+}}
+>
+
+<Icon
+icon="hugeicons:search-02"
+width="20"
+height="20"
+/>
+
+Cari Manual
+
+</div>          </button>
 
         </div>
 
@@ -674,23 +719,21 @@ export default function ReturnPage({
               }}
             >
 
-              <img
-                src={bukuKosong}
-                alt="kosong"
+              <Icon
 
-                style={{
+icon="solar:book-bold"
 
-                width:80,
+style={{
 
-                height:80,
+fontSize:80,
 
-                objectFit:"contain",
+color:"#4f46e5",
 
-                marginBottom:12
+marginBottom:12
 
-                }}
-                />
+}}
 
+/>
               <h2>
                 Belum Ada Data Peminjam
               </h2>
@@ -765,8 +808,29 @@ export default function ReturnPage({
                       }
                       className="return-btn"
                     >
-                      Kembalikan Buku
-                    </button>
+<div
+style={{
+
+display:"flex",
+
+alignItems:"center",
+
+justifyContent:"center",
+
+gap:8
+
+}}
+>
+
+<Icon
+icon="solar:book-bookmark-bold"
+width="20"
+height="20"
+/>
+
+Kembalikan Buku
+
+</div>                    </button>
 
                   </div>
 

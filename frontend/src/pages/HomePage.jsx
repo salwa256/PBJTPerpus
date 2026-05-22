@@ -11,12 +11,8 @@ import { formatDate } from "../utils/helpers";
 
 import StatusPill from "../components/StatusPill";
 
-// ICONS
-import buku from "../assets/addbooks.png";
-import borrow from "../assets/borrow.png";
-import terlambat from "../assets/terlambat.png";
-import ada from "../assets/ada.png";
-import anggota from "../assets/anggota.png";
+import { Icon }
+from "@iconify/react";
 
 export default function HomePage({
   showToast,
@@ -1179,8 +1175,7 @@ function StatCards({
       badge: "Koleksi",
       bg: "#dbeafe",
       color: "#1e40af",
-      icon: buku,
-    },
+      icon:"solar:library-bold",    },
 
     {
       label: "Dipinjam",
@@ -1188,8 +1183,7 @@ function StatCards({
       badge: "Aktif",
       bg: "#fef3c7",
       color: "#92400e",
-      icon: borrow,
-    },
+icon:"solar:book-bookmark-bold",    },
 
     {
       label: "Tersedia",
@@ -1197,8 +1191,7 @@ function StatCards({
       badge: "Siap Pinjam",
       bg: "#dcfce7",
       color: "#166534",
-      icon: ada,
-    },
+icon:"solar:check-circle-bold",    },
 
     {
       label: "Terlambat",
@@ -1206,8 +1199,7 @@ function StatCards({
       badge: "Perhatian",
       bg: "#fee2e2",
       color: "#991b1b",
-      icon: terlambat,
-    },
+icon:"solar:danger-triangle-bold",    },
 
     {
       label: "Anggota",
@@ -1215,8 +1207,7 @@ function StatCards({
       badge: "Terdaftar",
       bg: "#dcfce7",
       color: "#166534",
-      icon: anggota,
-    },
+icon:"solar:users-group-rounded-bold",    },
   ];
 
   return (
@@ -1297,16 +1288,21 @@ function StatCards({
               }}
             >
 
-              <img
-                src={c.icon}
-                alt={c.label}
-                style={{
-                  width: 30,
-                  height: 30,
-                  objectFit:
-                    "contain",
-                }}
-              />
+              <Icon
+
+icon={c.icon}
+
+style={{
+
+fontSize:34,
+
+color:c.color,
+
+display:"block"
+
+}}
+
+/>
 
             </div>
 

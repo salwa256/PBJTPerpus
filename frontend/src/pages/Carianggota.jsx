@@ -3,6 +3,8 @@
 // ═══════════════════════════════════════════════════════
 import avatar from "../assets/anggota.png";
 import { useState } from "react";
+import { Icon }
+from "@iconify/react";
 
 import {
   useNavigate
@@ -673,32 +675,43 @@ member-card glass-card
                {/* AVATAR */}
               
                             <div
-                style={{
-                  width:68,
-                  height:68,
-                  borderRadius:20,
-                  overflow:"hidden",
-                  marginBottom:18,
-              
-                }}
-              >
-              
-              <img src={avatar}
-              alt="profile"
-              
-              style={{
-              
-              width:"100%",
-              
-              height:"100%",
-              
-              objectFit:"cover"
-              
-              }}
-              />
-              
-              </div>
-              
+style={{
+
+width:68,
+
+height:68,
+
+borderRadius:20,
+
+marginBottom:18,
+
+background:"#eef2ff",
+
+display:"flex",
+
+alignItems:"center",
+
+justifyContent:"center"
+
+}}
+>
+
+<Icon
+
+icon="solar:user-rounded-bold"
+
+style={{
+
+fontSize:34,
+
+color:"#4f46e5"
+
+}}
+
+/>
+
+</div>
+                            
 
               {/* NAME */}
 

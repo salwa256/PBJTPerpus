@@ -14,9 +14,13 @@ export default function MembersPage({
 
     const navigate =
     useNavigate();
-    const [members, setMembers] =
-    useState([]);
+const [members, setMembers] =
+useState([]);
 
+const [currentPage,setCurrentPage] =
+useState(1);
+
+const itemsPerPage = 5;
   const [majorFilter, setMajorFilter] =
     useState("");
 
@@ -65,6 +69,24 @@ export default function MembersPage({
       !majorFilter ||
       m.major === majorFilter
   );
+
+  const lastIndex =
+currentPage * itemsPerPage;
+
+const firstIndex =
+lastIndex - itemsPerPage;
+
+const currentMembers =
+filteredMembers.slice(
+firstIndex,
+lastIndex
+);
+
+const totalPages =
+Math.ceil(
+filteredMembers.length /
+itemsPerPage
+);
 
   async function handleSubmit() {
 
@@ -365,6 +387,56 @@ export default function MembersPage({
   }
 
 }
+
+/* ========================= */
+/* PAGINATION */
+/* ========================= */
+
+.pagination-wrap{
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+gap:10px;
+
+flex-wrap:nowrap;
+
+overflow-x:auto;
+
+-webkit-overflow-scrolling:touch;
+
+scrollbar-width:none;
+
+margin-top:20px;
+
+}
+
+.pagination-wrap::-webkit-scrollbar{
+
+display:none;
+
+}
+
+.pagination-wrap button{
+
+white-space:nowrap;
+
+flex-shrink:0;
+
+}
+
+@media(max-width:768px){
+
+.pagination-wrap{
+
+padding-bottom:10px;
+
+}
+
+}
       `}</style>
 
       <div
@@ -647,7 +719,7 @@ export default function MembersPage({
               </tr>
             </thead>
             <tbody>
-              {filteredMembers.map((m) => (
+              {currentMembers.map((m) => (
                 <tr key={m.id}>
                   <td style={{fontWeight:700}}>{m.name}</td>
                   <td>{m.member_code}</td>
@@ -709,8 +781,120 @@ export default function MembersPage({
                 </tr>
               ))}
             </tbody>
-          </table>
-          </div>
+</table>
+</div>
+
+{/* ───────── PAGINATION ───────── */}
+
+<div
+className="pagination-wrap"
+>
+
+<button
+
+disabled={currentPage===1}
+
+onClick={()=>
+setCurrentPage(
+(prev)=>prev-1
+)
+}
+
+style={{
+
+padding:"10px 16px",
+
+border:"none",
+
+borderRadius:10,
+
+background:
+currentPage===1
+?"#d1d5db"
+:"rgb(47, 53, 215)",
+
+color:"#fff",
+
+cursor:
+currentPage===1
+?"not-allowed"
+:"pointer",
+
+fontWeight:600
+
+}}
+
+>
+
+← Sebelumnya
+
+</button>
+
+
+<div
+style={{
+
+fontWeight:600,
+
+color:"#555",
+
+fontSize:14
+
+}}
+>
+
+{`Halaman ${currentPage} dari ${totalPages || 1}`}
+
+</div>
+
+
+<button
+
+disabled={
+currentPage===totalPages ||
+totalPages===0
+}
+
+onClick={()=>
+setCurrentPage(
+(prev)=>prev+1
+)
+}
+
+style={{
+
+padding:"10px 16px",
+
+border:"none",
+
+borderRadius:10,
+
+background:
+currentPage===totalPages
+|| totalPages===0
+?"#d1d5db"
+:"rgb(47, 53, 215)",
+
+color:"#fff",
+
+cursor:
+currentPage===totalPages
+?"not-allowed"
+:"pointer",
+
+fontWeight:600
+
+}}
+
+>
+
+Selanjutnya →
+
+</button>
+
+</div>
+
+
         </div>
 
       </div>

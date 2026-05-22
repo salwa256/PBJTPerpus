@@ -9,6 +9,8 @@ import FormField, {
   inputStyle,
 } from "../components/FormField";
 import StatusPill from "../components/StatusPill";
+import { Icon }
+from "@iconify/react";
 
 // ───────── CATEGORY ─────────
 
@@ -44,19 +46,44 @@ export default function BooksPage({
 
   // ───────── STATES ─────────
 
-  const [books, setBooks] =
-    useState([]);
+const [books, setBooks] =
+  useState([]);
 
-  const [form, setForm] =
-    useState({
-      id: "",
-      title: "",
-      author: "",
-      jenis: "Buku",
-      category: "Fiksi",
-      year: "",
-    });
+const [currentPage,setCurrentPage] =
+  useState(1);
 
+const itemsPerPage = 5;
+
+const [form, setForm] =
+  useState({
+    id: "",
+    title: "",
+    author: "",
+    jenis: "Buku",
+    category: "Fiksi",
+    year: "",
+  });
+
+
+// ───────── PAGINATION ─────────
+
+const lastIndex =
+  currentPage * itemsPerPage;
+
+const firstIndex =
+  lastIndex - itemsPerPage;
+
+const currentBooks =
+  books.slice(
+    firstIndex,
+    lastIndex
+  );
+
+const totalPages =
+  Math.ceil(
+    books.length /
+    itemsPerPage
+  );
   // ───────── LOAD DATA ─────────
 
   useEffect(() => {
@@ -388,6 +415,64 @@ border-radius:999px;
 }
 }
 
+/* ========================= */
+/* PAGINATION RESPONSIVE */
+/* ========================= */
+
+.pagination-wrap{
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+gap:10px;
+
+flex-wrap:nowrap;
+
+overflow-x:auto;
+
+-webkit-overflow-scrolling:touch;
+
+scrollbar-width:none;
+
+}
+
+.pagination-wrap::-webkit-scrollbar{
+
+display:none;
+
+}
+
+.pagination-wrap button{
+
+white-space:nowrap;
+
+flex-shrink:0;
+
+}
+
+
+@media(max-width:768px){
+
+.pagination-wrap{
+
+gap:8px;
+
+padding:14px 10px!important;
+
+}
+
+.pagination-wrap button{
+
+padding:8px 12px!important;
+
+font-size:12px!important;
+
+}
+
+}
       `}</style>
 
       {/* ───────── PAGE ───────── */}
@@ -722,7 +807,7 @@ border-radius:999px;
 
                 ) : (
 
-                  books.map((b) => (
+                  currentBooks.map((b) => (
 
                     <tr
                       key={b.id}
@@ -784,31 +869,51 @@ border-radius:999px;
                         {b.status ===
                           "tersedia" && (
 
-                          <button
-  onClick={() =>
-    handleDeleteBook(
-      b.id
-    )
-  }
-        className="delete-btn"
-        style={{
-          background:
-            "#ef4444",
-          color:
-            "#fff",
-          border:
-            "none",
-          borderRadius: 10,
-          padding:
-            "7px 12px",
-          fontSize: 12,
-          fontWeight: 700,
-          cursor:
-            "pointer",
-        }}
-      >
-        🗑
-      </button>
+               <button
+
+onClick={() =>
+handleDeleteBook(
+b.id
+)
+}
+
+className="delete-btn"
+
+style={{
+
+background:"#ef4444",
+
+color:"#fff",
+
+border:"none",
+
+borderRadius:10,
+
+padding:"7px 12px",
+
+fontSize:12,
+
+fontWeight:700,
+
+cursor:"pointer",
+
+display:"flex",
+
+alignItems:"center",
+
+justifyContent:"center"
+
+}}
+
+>
+
+<Icon
+icon="solar:trash-bin-trash-bold"
+width="18"
+height="18"
+/>
+
+</button>
 
                         )}
 
@@ -823,6 +928,140 @@ border-radius:999px;
               </tbody>
 
             </table>
+            {/* ───────── PAGINATION ───────── */}
+
+<div
+className="pagination-wrap"
+
+style={{
+
+display:"flex",
+
+justifyContent:"center",
+
+alignItems:"center",
+
+gap:10,
+
+padding:20,
+
+flexWrap:"nowrap",
+
+background:"#fff",
+
+overflowX:"auto",
+
+WebkitOverflowScrolling:"touch"
+
+}}
+>
+<button
+
+disabled={currentPage===1}
+
+onClick={()=>
+setCurrentPage(
+(prev)=>prev-1
+)
+}
+
+style={{
+
+padding:"10px 16px",
+
+border:"none",
+
+borderRadius:10,
+
+background:
+currentPage===1
+?"#d1d5db"
+:"rgb(47, 53, 215)",
+
+color:"#fff",
+
+cursor:
+currentPage===1
+?"not-allowed"
+:"pointer",
+
+fontWeight:600,
+
+transition:".2s"
+
+}}
+
+>
+
+← Sebelumnya
+
+</button>
+
+
+<div
+style={{
+
+fontWeight:600,
+
+color:"#555",
+
+fontSize:14
+
+}}
+>
+
+{`Halaman ${currentPage} dari ${totalPages || 1}`}
+
+</div>
+
+
+<button
+
+disabled={
+currentPage===totalPages ||
+totalPages===0
+}
+
+onClick={()=>
+setCurrentPage(
+(prev)=>prev+1
+)
+}
+
+style={{
+
+padding:"10px 16px",
+
+border:"none",
+
+borderRadius:10,
+
+background:
+currentPage===totalPages
+|| totalPages===0
+?"#d1d5db"
+:"rgb(47, 53, 215)",
+
+color:"#fff",
+
+cursor:
+currentPage===totalPages
+?"not-allowed"
+:"pointer",
+
+fontWeight:600,
+
+transition:".2s"
+
+}}
+
+>
+
+Selanjutnya →
+
+</button>
+
+</div>
 
           </div>
 

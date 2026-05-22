@@ -27,22 +27,15 @@ export default defineConfig({
 
       manifest:{
 
-        name:"Perpustakaan PBJT",
+        name:"PBJT",
 
         short_name:"PBJT",
-
-        description:
-        "Sistem Perpustakaan PBJT",
 
         theme_color:"#5b3df5",
 
         background_color:"#ffffff",
 
         display:"standalone",
-
-        orientation:"portrait",
-
-        start_url:"/",
 
         icons:[
 
