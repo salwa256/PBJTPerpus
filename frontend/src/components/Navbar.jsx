@@ -8,13 +8,13 @@ from "@iconify/react";
 
 const TABS=[
 
-{
-id:"home",
-label:"Beranda",
-icon:"solar:home-2-bold",
-path:"/",
-roles:["admin"]
-},
+  {
+    id: "home",
+    label: "Dashboard",
+    icon: "material-symbols:dashboard",
+    path: "/",
+    roles: ["admin"],
+  },
 
 {
 id:"carianggota",
