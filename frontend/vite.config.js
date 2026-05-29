@@ -13,7 +13,7 @@ export default defineConfig({
       registerType:"autoUpdate",
 
       includeAssets:[
-        "3.png"
+        "splashscreen.png"
       ],
 
       devOptions:{
@@ -40,13 +40,13 @@ export default defineConfig({
         icons:[
 
           {
-            src:"5.png",
+            src:"icon.png",
             sizes:"192x192",
             type:"image/png"
           },
 
           {
-            src:"5.png",
+            src:"icon.png",
             sizes:"512x512",
             type:"image/png"
           }

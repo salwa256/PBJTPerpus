@@ -23,7 +23,6 @@ import {
   formatDate,
 } from "../utils/helpers";
 
-import bukuKosong from "../assets/buku.png";
 export default function ReturnPage({
   showToast,
   setLoader,

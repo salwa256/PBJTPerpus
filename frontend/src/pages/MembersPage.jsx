@@ -1,7 +1,6 @@
 import { useState, useEffect } from "react";
 import { apiFetch } from "../utils/api";
 import { useNavigate } from "react-router-dom";
-import avatar from "../assets/anggota.png";
 import FormField, { inputStyle } from "../components/FormField";
 
 export default function MembersPage({

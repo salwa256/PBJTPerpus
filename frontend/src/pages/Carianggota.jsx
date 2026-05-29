@@ -1,7 +1,6 @@
 // ═══════════════════════════════════════════════════════
 // pages/Carianggota.jsx
 // ═══════════════════════════════════════════════════════
-import avatar from "../assets/anggota.png";
 import { useState } from "react";
 import { Icon }
 from "@iconify/react";

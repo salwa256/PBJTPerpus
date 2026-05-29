@@ -21,7 +21,7 @@ background:"#fff"
 >
 
 <img
-src="/4.png"
+src="/splashscreen.png"
 
 style={{
 
