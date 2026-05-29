@@ -803,7 +803,7 @@ color:"#4f46e5"
                     width: "100%",
 
                     background:
-                      "linear-gradient(135deg,#4f46e5,#7c3aed)",
+                      "#2f35d7",
 
                     color: "#fff",
 

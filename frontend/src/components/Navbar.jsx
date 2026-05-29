@@ -19,7 +19,7 @@ const TABS=[
 {
 id:"carianggota",
 label:"Cari Anggota",
-icon:"hugeicons:user-search-01",
+icon:"mingcute:user-search-fill",
 path:"/carianggota",
 roles:["admin","petugas"]
 },
@@ -43,7 +43,7 @@ roles:["admin","petugas"]
 {
 id:"search",
 label:"Cari Buku",
-icon:"hugeicons:search-02",
+icon:"garden:search-fill-12",
 path:"/search",
 roles:["admin","petugas"]
 },
@@ -59,7 +59,7 @@ roles:["admin","petugas"]
 {
 id:"chatbot",
 label:"Asisten Perpus",
-icon:"solar:chat-round-dots-bold",
+icon:"tabler:message-chatbot-filled",
 path:"/chatbot",
 roles:["admin","petugas"]
 },

@@ -645,12 +645,6 @@ gap:8
 }}
 >
 
-<Icon
-icon="solar:camera-bold"
-width="22"
-height="22"
-/>
-
 {scanning
 ? "Membaca Kartu..."
 : "Scan Kartu"}
@@ -691,12 +685,6 @@ gap:8
 
 }}
 >
-
-<Icon
-icon="hugeicons:search-02"
-width="20"
-height="20"
-/>
 
 Cari Manual
 
